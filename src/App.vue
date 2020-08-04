@@ -1,23 +1,20 @@
 <template>
   <div id="app" :class="page">
-    <page-top-navbar v-if="false"></page-top-navbar>
+    <page-top-navbar></page-top-navbar>
     <transition mode="out-in" name="fade" appear>
-      <router-view v-if="false"></router-view>
+      <router-view ></router-view>
     </transition>
-    <home-navbar v-if="false"></home-navbar>
-    <test-hex-grid :hex-columns="10" :hex-rows="10" :hex-size="100"></test-hex-grid>
+    <home-navbar></home-navbar>
   </div>
 </template>
 <script>
 
 import PageTopNavbar from "@/components/All Pages/PageTopNavbar";
 import HomeNavbar from "@/components/pages/Home/HomeNavbar";
-import TestHexGrid from "@/components/All Pages/TestHexGrid";
 
 export default {
   name: 'App',
   components: {
-    TestHexGrid,
     HomeNavbar,
     PageTopNavbar,
   },
