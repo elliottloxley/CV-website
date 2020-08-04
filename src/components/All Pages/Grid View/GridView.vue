@@ -1,10 +1,8 @@
 <template>
   <div class="grid-view">
-    <transition-group name="item-fade" class="grid-container" tag="div">
-      <grid-view-item v-for="item in gridItems" v-bind:key="item.id"
-                      :desc-selected-id="descriptionShownId" :gridItem="item"
-                      @descriptionClicked="handleDescriptionSelected($event)"></grid-view-item>
-    </transition-group>
+    <grid-view-item :max-width="itemMaxWidth" v-for="item in gridItems" v-bind:key="item.id"
+                    :desc-selected-id="descriptionShownId" :gridItem="item"
+                    @descriptionClicked="handleDescriptionSelected($event)"></grid-view-item>
   </div>
 </template>
 
@@ -17,14 +15,15 @@ export default {
     dataUrl: {
       type: String,
       required: true
-    }
+    },
+    itemMaxWidth: String
   },
   components: {GridViewItem},
   data: function () {
     return {
       gridItems: [],
       animationDelay: 0,
-      animationDelayIncrement: 300,
+      animationDelayIncrement: 150,
       descriptionShownId: null
     };
   },
@@ -57,7 +56,7 @@ export default {
     },
     dummyData() {
       //TODO delete when deployed, replace with real data
-      return Array.from({ length: 5 }, () => ({"id" : 1,
+      return Array.from({ length: 20 }, () => ({"id" : 1,
           "name" : "alexsite",
           "title" : "Alexander music site",
           "short_desc" : "site for my brother alexander",
@@ -89,9 +88,6 @@ export default {
 <style lang="stylus" type="text/stylus" scoped>
 
 .grid-view {
-}
-
-.grid-container {
   display grid;
   grid-template-columns repeat(auto-fill, minmax(25rem, 1fr));
   column-gap 60px;

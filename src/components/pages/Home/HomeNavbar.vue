@@ -27,7 +27,7 @@ export default {
   },
   data() {
     return {
-      enterDelayPattern: [0, 250, 100, 350],
+      enterDelayPattern: [50, 250, 100, 350],
       leaveDelayPattern: [350, 150, 250, 50],
       show: true
     }
@@ -49,7 +49,9 @@ export default {
   watch: {
     $route(to, from) {
       if(to.name === "home") {
-        this.menuEnter();
+        setTimeout(() => {
+          this.menuEnter()
+        }, 500);
       }
       else if(from.name === "home") {
         this.menuLeave();

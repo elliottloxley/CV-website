@@ -2,7 +2,7 @@
   <div class="websites">
     <div class="websites-container">
       <div class="grid-container">
-        <grid-view data-url="api/getDummyData1.php"></grid-view>
+        <grid-view :item-max-width="'80vw'" data-url="api/getDummyData1.php"></grid-view>
       </div>
     </div>
   </div>
@@ -27,12 +27,12 @@ export default {
 }
 
 .websites-container {
-  margin-top 10vh;
+  margin-top 20vh;
 }
 
 .grid-container {
   width 80%;
-  padding 20vh 5% 0 10%;
+  padding 20vh 10% 0 10%;
   box-sizing content-box;
 }
 

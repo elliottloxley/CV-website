@@ -81,7 +81,7 @@ export default {
 }
 
 .item-container:hover .nav-popup-text {
-  transform translateY(-60%);
+  transform translateY(-1rem);
   opacity 1;
 
   transition opacity 0.3s, transform 0.5s;
@@ -107,7 +107,6 @@ export default {
   opacity 0;
   display block;
   width 100%;
-
   transition all 0.5s;
 }
 
@@ -116,6 +115,7 @@ export default {
   visibility visible;
   transform translateY(0px);
   opacity 1;
+  transition all 0.5s;
 }
 
 </style>

@@ -1,12 +1,12 @@
 <template>
-  <div class="grid-view-item item-external-modify">
+  <div :style="itemMaxSize" class="grid-view-item item-external-modify">
     <div class="grid-content content-external-modify">
       <div class="title-img-wrapper">
         <div class="title highlight-external-modify title-external-modify">
           {{ gridItem["title"]}}
         </div>
           <div :style="imageStyleUrl" class="grid-img">
-            <transition name="slide">
+            <transition name="fade">
               <div v-if="descriptionShown" class="description-text">
                 <span>{{gridItem["short_desc"]}}</span>
               </div>
@@ -34,7 +34,8 @@ export default {
   name: "GridViewItem",
   props: {
     gridItem: Object,
-    descSelectedId: Number
+    descSelectedId: Number,
+    maxWidth: String
   },
   data() {
     return {
@@ -52,6 +53,9 @@ export default {
     },
     descriptionShown() {
       return this.descSelectedId === this.gridItem.id;
+    },
+    itemMaxSize() {
+      return {'max-width' : this.maxWidth}
     }
   },
   methods: {
@@ -78,6 +82,7 @@ button {
   text-align center;
   color miscTextColour;
   transition all 0.5s;
+  animation self-slide-down 0.5s, self-fade-in 0.8s;
 }
 
 .grid-view-item:hover {
@@ -137,7 +142,7 @@ button {
   width 100%;
   padding 2% 0;
   border-radius 8px;
-  box-shadow 0 6px 4px -4px black;
+  box-shadow 0 6px 4px -4px miscDarkShadow;
   z-index 100;
   flex-basis min-content;
 }
@@ -148,18 +153,19 @@ button {
   align-items center;
   z-index: 2;
   right 0;
-  box-shadow -2px -2px 4px -1px black;
+  box-shadow 0 -2px 4px 1px miscDarkShadow;
   cursor: pointer;
   transition all 0.3s;
   animation icon-wobble 0.5s;
   animation-delay 1.3s;
+  color miscLinkColour;
 }
 
 .description-icon {
   display flex;
   justify-content center;
   align-items center;
-  box-shadow 2px -2px 4px -1px black;
+  box-shadow 2px -2px 4px -1px miscDarkShadow;
   cursor: pointer;
   transition all 0.3s;
   animation icon-wobble 0.5s;
@@ -229,32 +235,40 @@ button {
   transition all 0.5s;
 }
 
-.slide-enter-active {
+.fade-enter-active {
   opacity 0;
-  animation slide-in 0.5s;
+  animation self-fade-in 0.5s;
   animation-delay 0.5s;
 }
 
-.slide-leave-active {
-  animation slide-out 0.5s;
+.fade-leave-active {
+  animation self-fade-out 0.5s;
 }
 
-@keyframes slide-in {
-  from {
+@keyframes self-slide-down {
+  0% {
+    transform translateY(-5%) scale(0.95);
+  }
+  100% {
+    transform translateY(0px) scale(1);
+  }
+}
+
+@keyframes self-fade-in {
+  0% {
     opacity 0;
   }
-  to {
+  100% {
     opacity 1;
   }
 }
 
-@keyframes slide-out {
-  from {
+@keyframes self-fade-out {
+  0% {
     opacity 1;
   }
-  to {
+  100% {
     opacity 0;
   }
 }
-
 </style>
