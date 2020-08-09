@@ -1,10 +1,10 @@
 <template>
   <div id="app" :class="page">
-    <page-top-navbar></page-top-navbar>
+    <page-top-navbar v-if="false"></page-top-navbar>
     <transition mode="out-in" name="fade" appear>
-      <router-view ></router-view>
+      <router-view></router-view>
     </transition>
-    <home-navbar></home-navbar>
+    <home-navbar v-if="false"></home-navbar>
   </div>
 </template>
 <script>

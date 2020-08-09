@@ -1,19 +1,19 @@
 <template>
   <div class="home">
-    <avatar-banner/>
-    <page-banner title="Elliott Chisholm-Loxley" subtitle="my cv" description="description"/>
+    <blob-line class="test-blob"></blob-line>
+    <blob class="test-blob2"></blob>
   </div>
 </template>
 
 <script>
-import PageBanner from "@/components/pages/Home/HomeBanner";
-import AvatarBanner from "@/components/pages/Home/HomeAvatar";
 
+import BlobLine from "@/components/All Pages/Grid View/BlobLine";
+import Blob from "@/components/All Pages/Blob";
 export default {
   name: "Home",
   components: {
-    'page-banner': PageBanner,
-    'avatar-banner': AvatarBanner
+    Blob,
+    BlobLine,
   }
 }
 </script>
@@ -34,6 +34,14 @@ export default {
   display grid;
   grid-gap 0;
   grid-template-rows 1fr 1fr 0.8fr;
+}
+
+.test-blob, .test-blob2 {
+  width 50vh;
+  height 50vh;
+}
+
+.test-blob2 {
 }
 
 </style>
