@@ -3,15 +3,16 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 import VueAxios from "vue-axios";
-import PerfectScrollbar from "vue2-perfect-scrollbar";
-import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
+import ColourTheme from "@/themes/ColourTheme";
 
 Vue.use(VueAxios, axios)
-Vue.use(PerfectScrollbar);
 
 Vue.config.productionTip = false
-
 new Vue({
+    data: {
+        blobStatic: false,
+        currentTheme: ColourTheme.light
+    },
     render: h => h(App),
     router
 }).$mount('#app')

@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import HomeNavbarItem from "@/components/pages/Home/HomeNavbarItem";
+import HomeNavbarItem from "@/components/old work/HomeNavbarItem";
 
 export default {
   name: "HomeNavbar",
@@ -73,7 +73,7 @@ export default {
 
 <style lang="stylus" type="text/stylus" scoped>
 
-@import "../../../themes/variables.styl"
+@import "../../themes/variables.styl"
 
 .home-navbar {
   position absolute;

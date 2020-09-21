@@ -16,10 +16,8 @@
     "stylus-loader": "^3.0.2",
     "vue": "^2.6.11",
     "vue-axios": "^2.1.5",
-    "vue-feather-icons": "^5.0.0",
-    "vue-router": "^3.3.4",
-    "vue2-perfect-scrollbar": "^1.5.0",
-    "yarn": "^1.22.4"
+    "vue-md-icons": "^1.2.0",
+    "vue-router": "^3.3.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",

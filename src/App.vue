@@ -1,22 +1,28 @@
 <template>
-  <div id="app" :class="page">
-    <page-top-navbar v-if="false"></page-top-navbar>
+  <div id="app" :class="page" :style="{backgroundColor: $root.currentTheme.background.base}">
+    <settings-panel class="setting-panel"></settings-panel>
     <transition mode="out-in" name="fade" appear>
-      <router-view></router-view>
+      <router-view class="page-view"></router-view>
     </transition>
-    <home-navbar v-if="false"></home-navbar>
+    <navbar class="navbar" :button-fill="$root.currentTheme.feature.highlight"
+            :text-colour="$root.currentTheme.text.base"
+            :background-colour="$root.currentTheme.background.base"></navbar>
+    <SvgFilters></SvgFilters>
   </div>
 </template>
 <script>
 
-import PageTopNavbar from "@/components/All Pages/PageTopNavbar";
-import HomeNavbar from "@/components/pages/Home/HomeNavbar";
+import Navbar from "@/components/All Pages/Navbar";
+import SvgFilters from "@/components/All Pages/SvgFilters";
+import 'vue-md-icons/src/icons/settings'
+import SettingsPanel from "@/components/All Pages/SettingsPanel";
 
 export default {
   name: 'App',
   components: {
-    HomeNavbar,
-    PageTopNavbar,
+    SettingsPanel,
+    SvgFilters,
+    Navbar,
   },
   data () {
     return {
@@ -39,6 +45,8 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,700&display=swap');
 @import "themes/variables.styl";
 
+* { -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+
 html, body {
   width 100%;
   height 100vh;
@@ -47,32 +55,23 @@ html, body {
   font-family "Open Sans";
 }
 
-.home {
-  background-color homePageBaseColour;
-}
-
-.websites {
-  background-color websitesPageBaseColour;
-  overflow-y scroll;
-}
-
-.about {
-  background-color aboutPageBaseColour;
-}
-
-.software {
-  background-color softwarePageBaseColour;
-}
-
-.contact {
-  background-color contactPageBaseColour;
-}
-
 #app {
   height 100%;
   transition background-color 0.8s;
   position relative;
+  z-index 0;
+}
+
+.settings-panel {
+  z-index 3;
+}
+
+.page-view {
   z-index 1;
+}
+
+.navbar {
+  z-index 2
 }
 
 .fade-enter-active {

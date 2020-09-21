@@ -1,9 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/pages/Home/Home.vue'
-import Websites from "@/components/pages/Websites/Websites";
-import CV from "@/components/pages/CV/CV";
-import Software from "@/components/pages/Software/Software";
+import Work from "@/components/pages/work/Work";
+import Bio from "@/components/pages/Bio/Bio";
 import Contact from "@/components/pages/Contact/Contact";
 
 Vue.use(Router)
@@ -16,19 +15,14 @@ export default new Router({
             component: Home
         },
         {
-            path: '/websites',
-            name: 'websites',
-            component: Websites
+            path: '/work',
+            name: 'work',
+            component: Work
         },
         {
-            path: '/about',
-            name: 'about',
-            component: CV
-        },
-        {
-            path: '/software',
-            name: 'software',
-            component: Software
+            path: '/bio',
+            name: 'bio',
+            component: Bio
         },
         {
             path: '/contact',

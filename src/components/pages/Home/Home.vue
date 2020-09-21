@@ -1,19 +1,44 @@
 <template>
   <div class="home">
-    <blob-line class="test-blob"></blob-line>
-    <blob class="test-blob2"></blob>
+    <blob-line :path-style="{fill: $root.currentTheme.background.highlight}"
+               :start-point-user="[0,0.8]"
+               :end-point-user="[0.8,0]"
+               :curve-magnitude-normal="0.5"
+               :edge-offset="0.2"
+               :loop-duration="1.5"
+               :wiggle-magnitude="1.5"
+               class="highlight-blob"></blob-line>
+    <div class="title">
+      <blob :path-style-user="{fill: $root.currentTheme.feature.base}" :vertex-count="20" :aspect-ratio="[1, 0.5]"></blob>
+    </div>
   </div>
 </template>
 
 <script>
 
-import BlobLine from "@/components/All Pages/Grid View/BlobLine";
+import BlobLine from "@/components/All Pages/BlobLine";
+import 'vue-md-icons/src/icons/home'
+import 'vue-md-icons/src/icons/menu'
+import 'vue-md-icons/src/icons/work'
+import 'vue-md-icons/src/icons/person'
+import 'vue-md-icons/src/icons/call'
+import 'vue-md-icons/src/icons/clear'
 import Blob from "@/components/All Pages/Blob";
+
+
 export default {
   name: "Home",
   components: {
     Blob,
-    BlobLine,
+    BlobLine
+  },
+  data() {
+    return {
+    }
+  },
+  computed: {
+  },
+  methods: {
   }
 }
 </script>
@@ -22,26 +47,12 @@ export default {
 
 @import "../../../themes/variables.styl"
 
-.home {
-  height 95vh;
+.highlight-blob {
   position absolute;
-  bottom 0;
-  width 100%;
-  -webkit-font-smoothing antialiased;
-  -moz-osx-font-smoothing grayscale;
-  text-align center;
-  color miscTextColour;
-  display grid;
-  grid-gap 0;
-  grid-template-rows 1fr 1fr 0.8fr;
-}
-
-.test-blob, .test-blob2 {
-  width 50vh;
-  height 50vh;
-}
-
-.test-blob2 {
+  top 0;
+  left 0;
+  width 30vmax;
+  height 30vmax
 }
 
 </style>

@@ -17,10 +17,9 @@
     </div>
     <div class="menu-wrapper">
       <button :class="{'depressed' : descriptionShown}" @click="descriptionClicked" class="description-icon highlight-external-modify">
-        <FileTextIcon size="2.3x"></FileTextIcon>
       </button>
       <button class="link-icon">
-        <ExternalLinkIcon size="2x"></ExternalLinkIcon>
+
       </button>
     </div>
   </div>
@@ -28,7 +27,7 @@
 
 <script>
 
-import {ExternalLinkIcon, FileTextIcon} from "vue-feather-icons"
+
 
 export default {
   name: "GridViewItem",
@@ -42,8 +41,6 @@ export default {
     }
   },
   components: {
-    ExternalLinkIcon,
-    FileTextIcon
   },
   computed: {
     imageStyleUrl() {
@@ -68,7 +65,7 @@ export default {
 
 <style lang="stylus" type="text/stylus" scoped>
 
-@import "../../../themes/variables.styl"
+@import "../../themes/variables.styl"
 
 button {
   border none;

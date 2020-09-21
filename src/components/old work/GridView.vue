@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import GridViewItem from "@/components/All Pages/Grid View/GridViewItem";
+import GridViewItem from "@/components/old work/GridViewItem";
 
 export default {
   name: "GridView",

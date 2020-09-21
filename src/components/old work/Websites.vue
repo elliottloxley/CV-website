@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import GridView from "@/components/All Pages/Grid View/GridView";
+import GridView from "@/components/old work/GridView";
 
 export default {
   name: "Websites",
@@ -19,7 +19,7 @@ export default {
 
 <style lang="stylus" type="text/stylus" scoped>
 
-@import "../../../themes/variables.styl";
+@import "../../themes/variables.styl";
 
 .websites {
   overflow auto;

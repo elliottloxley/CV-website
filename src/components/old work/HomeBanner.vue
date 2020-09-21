@@ -28,7 +28,7 @@ export default {
 
 <style lang="stylus" type="text/stylus" scoped>
 
-@import "../../../themes/variables.styl";
+@import "../../themes/variables.styl";
 
 .text-container {
   gradientCenter(homePageBaseColour, homePageBannerColour, 0%);
