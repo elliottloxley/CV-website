@@ -1,12 +1,12 @@
 <template>
   <svg ref="parentSVG" :style="svgStyle" :viewBox="svgSize">
-    <path @mouseleave="mouseLeave" @mouseenter="mouseEnter" @click="clicked" class="blob-path" :style="pathStyle" :id="generatedId" :d="staticPath">
+    <path ref="blobPath" @mouseleave="mouseLeave" @mouseenter="mouseEnter" @click="clicked" class="blob-path" :style="pathStyle" :id="generatedId" :d="staticPath">
       <animate v-if="!frozen" ref="toAnimation" :id="animationID" :href="'#' + generatedId" attributeName="d" attributeType="XML"
                :from="currentPathSVG" :to="pathToMoveToSVG" :dur="loopDuration + durationRandomised + 's'"
                fill="freeze"></animate>
     </path>
     <g v-if="testMode" class="test-visuals">
-      <rect fill="red" width="10" height="10" v-for="coord in this.coords" :key="'' + coord.x + ''+ coord.y" :x="coord.x - 5" :y="coord.y -5"></rect>
+      <rect fill="red" width="50" height="50" v-for="coord in this.coords" :key="'' + coord.x + ''+ coord.y" :x="coord.x - 5" :y="coord.y -5"></rect>
     </g>
   </svg>
 </template>
@@ -31,14 +31,20 @@ name: "Blob",
     wiggleMagnitude: {default: 1, type:Number},
     propertyUpdateTime: {default: 0.3, type:Number},
     spinRate: {default: 0.15, type:Number},
+    spinDirection: {default: 0, type:Number}, //1 == clockwise | -1 == anti-clockwise | 0 == random each animation loop
     frozen: {default: false, type:Boolean},
     testMode: {default: false, type:Boolean},
     name: {default: "", type:String},
-    shortText: {default: '', type:String}
+    shortText: {default: '', type:String},
+    vertexVariance: {default: 0, type:Number}, //percentage of step size | capped at > 0.3
+    enableDetectClickOutside: {default: false, type:Boolean},
+    randomiseStartPoint: {default: false, type:Boolean},
+    startPointRandomisePercentage: {default: 1, type:Number, validator(value) { return value <= 1 && value >= 0 }},
+    vertexSharpnessModifier: {default: 1, type:Number}
   },
   data() {
     return {
-      curveStrengthFactor: 4.5,
+      curveStrengthFactor: 4.5 * this.vertexSharpnessModifier,
       currentPathSVG: "",
       pathToMoveToSVG: "",
       startPathSVG: "",
@@ -50,7 +56,7 @@ name: "Blob",
       coords: [],
       durationChange: {changed:false, to: 0, from: 0},
       propertyChanged: true,
-      joinOffset: 1,
+      joinOffset: this.randomiseStartPoint ? this.randomNegativePositiveRange(0, 2 * Math.PI * this.startPointRandomisePercentage) : 1,
       staticPath: ""
     }
   },
@@ -103,12 +109,22 @@ name: "Blob",
     generateCoords() {
       let pathArray = [];
       let count = 0;
+      let varianceStep;
+
+      if(this.vertexVariance > 0.3) {
+        varianceStep = 0.3 * this.vertexVariance;
+      } else {
+        varianceStep = this.vertexFactor * this.vertexVariance;
+      }
+
       let averageRadius = (this.xRadius + this.yRadius) / 2;
       //moves round circular path, placing points at vertexFactor deg interval
       for (let i = this.joinOffset; i < 2*Math.PI + this.joinOffset; i += this.vertexFactor) {
 
-        let x = ((this.xRadius + this.getRandomRadiusModifier(averageRadius)) * Math.cos(i) + this.centerX);
-        let y = ((this.yRadius + this.getRandomRadiusModifier(averageRadius)) * Math.sin(i) + this.centerY);
+        let tempVarStep = this.randomNegativePositiveRange(varianceStep);
+
+        let x = ((this.xRadius + this.getRandomRadiusModifier(averageRadius)) * Math.cos(i + tempVarStep) + this.centerX);
+        let y = ((this.yRadius + this.getRandomRadiusModifier(averageRadius)) * Math.sin(i + tempVarStep) + this.centerY);
         pathArray.push({x,y});
         if(count === this.vertexCount-1) {
           break;
@@ -117,8 +133,22 @@ name: "Blob",
       }
       return pathArray;
     },
+    getSpin() {
+      if(this.spinDirection === 0) {
+        return this.randomNegativePositive(this.spinRate);
+      }
+      else if(this.spinDirection > 0) {
+        return this.spinRate;
+      }
+      else if(this.spinDirection < 0) {
+        return -this.spinRate;
+      }
+    },
     randomNegativePositive(val) {
       return val * (Math.floor(Math.random()*2) === 1 ? 1 : -1);
+    },
+    randomNegativePositiveRange(range) {
+      return this.randomNegativePositive(Math.random() * range);
     },
     getRandomRadiusModifier(radius) {
       let num = Math.floor(Math.random() * (radius / 15)) + 1;
@@ -172,7 +202,7 @@ name: "Blob",
       this.updateShapeValues();
 
       this.currentPathSVG = this.generateSvgPath(this.generateCoords());
-      this.joinOffset += this.randomNegativePositive(this.spinRate);
+      this.joinOffset += this.getSpin();
       this.pathToMoveToSVG = this.generateSvgPath(this.generateCoords());
 
       this.$refs.parentSVG.setCurrentTime(0);
@@ -184,7 +214,7 @@ name: "Blob",
     blobAnimate() {
       this.currentPathSVG = this.pathToMoveToSVG;
       this.$refs.parentSVG.setCurrentTime(0);
-      this.joinOffset += this.randomNegativePositive(this.spinRate);
+      this.joinOffset += this.getSpin();
       let coords = this.generateCoords();
       this.pathToMoveToSVG = this.generateSvgPath(coords);
 
@@ -199,6 +229,12 @@ name: "Blob",
     },
     endAnimate() {
       this.$refs.toAnimation.removeEventListener('endEvent', this.blobAnimate);
+    },
+    clickedOutside(event) {
+      if (this.$refs.blobPath === event.target) {
+        return;
+      }
+      this.$emit('clickedOutside', event);
     }
   },
   updated() {
@@ -208,11 +244,24 @@ name: "Blob",
     }
   },
   mounted() {
+
+    if(this.enableDetectClickOutside) {
+      document.addEventListener("click", this.clickedOutside);
+    }
+
     this.initialise();
 
     if(this.frozen) {
-      this.staticPath = this.generateSvgPath(this.generateCoords());
+      let coords = this.generateCoords();
+
+      if(this.testMode) {
+        this.coords = coords;
+      }
+      this.staticPath = this.generateSvgPath(coords);
     }
+  },
+  beforeDestroy() {
+    document.removeEventListener("click", this.clickedOutside);
   },
   watch: {
     loopDuration(from, to) {

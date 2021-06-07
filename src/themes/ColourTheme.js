@@ -6,7 +6,7 @@ const ColourTheme = {
         },
         feature: {
             base: "rgba(0, 150, 0, 1)",
-            highlight: "rgba(0, 0, 255, 1)"
+            highlight: "rgba(0, 0, 150, 1)"
         },
         text: {
             base: "rgba(255, 255, 255, 1)"
@@ -14,7 +14,7 @@ const ColourTheme = {
     },
     dark: {
         background: {
-            base: "",
+            base: "rgba(0,0,0,1)",
             highlight: ""
         },
         feature: {

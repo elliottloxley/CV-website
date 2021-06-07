@@ -11,7 +11,7 @@ Vue.config.productionTip = false
 new Vue({
     data: {
         blobStatic: false,
-        currentTheme: ColourTheme.light
+        currentTheme: ColourTheme.dark
     },
     render: h => h(App),
     router

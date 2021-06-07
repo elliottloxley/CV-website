@@ -1,8 +1,11 @@
 <template>
 <div class="blob-button">
-  <blob :wiggle-magnitude="1" :loop-duration="1.5" :path-style-user="blobStyle"
-        :vertex-count="8"
-        @blobClicked="$emit('buttonClicked', name)" @blobMouseLeave="onBlobMouseLeave" @blobMouseEnter="onBlobMouseEnter"
+  <blob ref="buttonBlob" :wiggle-magnitude="1" :loop-duration="1.5" :path-style-user="blobStyle"
+        :vertex-count="blobVertices"
+        :frozen="blobStatic"
+        :wiggleMagnitude="blobMagnitude"
+        :enable-detect-click-outside="checkOutsideClick"
+        @blobClicked="$emit('buttonClicked', name)" @clickedOutside="clickedOutside" @blobMouseLeave="onBlobMouseLeave" @blobMouseEnter="onBlobMouseEnter"
         :class="{'blob-hover-blob' : isBlobHover && !disableHoverGrow}" class="blob"></blob>
   <div :style="contentStyle" class="content-container">
     <div class="icon-container">
@@ -35,6 +38,10 @@ name: "BlobButton",
     blobStyleUser: {default() {return {}}, type: Object},
     disableHoverGrow: {default: false, type:Boolean},
     showText: {default: false, type:Boolean},
+    checkOutsideClick: {default: false, type:Boolean},
+    blobStatic: {default: false, type:Boolean},
+    blobVertices: {default: 8, type:Number},
+    blobMagnitude: {default: 1, type:Number}
   },
   computed: {
     blobStyle() {
@@ -55,6 +62,9 @@ name: "BlobButton",
     onBlobMouseLeave() {
       this.$emit('buttonMouseLeave', name)
       this.isBlobHover = false
+    },
+    clickedOutside(event) {
+      this.$emit('clickedOutside', event)
     }
   },
   filters: {

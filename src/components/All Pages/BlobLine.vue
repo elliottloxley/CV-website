@@ -1,6 +1,6 @@
 <template>
   <div class="blob">
-    <svg :style="svgStyle" :viewBox="'0 0 ' + viewX + ' ' + viewY">
+    <svg class="blob-svg" preserveAspectRatio="none" :style="svgStyle" :viewBox="'0 0 ' + viewX + ' ' + viewY">
       <path ref="linePath" @mouseenter="mouseEnter" @mouseleave="mouseLeave" @click.prevent="clicked" :id="generatedId" :style="pathStyle" d="">
         <animate :ref="animationID" :id="animationID" :href="'#' + generatedId" attributeName="d" attributeType="XML"
                  :from="currentPathSVG" :to="pathToMoveToSVG" :dur="loopDuration + durationRandomised + 's'"
@@ -29,7 +29,7 @@ export default {
   props: {
     startPointUser: {default() { return [0, 0.5]; }},
     endPointUser: {default() { return [1, 0.5]; }},
-    vertexFactor: {default:0.1, type:Number},
+    vertexCount: {default: 10, type:Number},
     aspectRatio: {default() { return [1, 1]; }, type:Array},
     loopDuration: {default: 2, type: Number},
     curveMagnitudeNormal: {default: -0.25, type:Number},
@@ -68,6 +68,9 @@ export default {
     lineLength() {
       return Math.hypot((this.endPointUser[0] - this.startPointUser[0]) * this.viewX,
           (this.endPointUser[1] - this.startPointUser[1]) * this.viewY);
+    },
+    vertexFactor() {
+      return 1 / this.vertexCount;
     },
     lineAngle() {
       return Math.atan2((this.endPointUser[1] - this.startPointUser[1]) * this.viewY,
@@ -132,6 +135,56 @@ export default {
 
       return [bezFactor0, bezFactor1, bezFactor2, bezFactor3];
     },
+    distanceToEdge() {
+
+      let minX = 0;
+      let minY = 0;
+      let maxX = this.viewX;
+      let maxY = this.viewY;
+
+      var midX = (minX + maxX) / 2;
+      var midY = (minY + maxY) / 2;
+
+      let centerPoint = {x: midX, y: midY}
+      let edgePoint = {};
+
+      let outsidePoint = this.movePoint(centerPoint, this.lineAngle + (Math.PI / 2), (Math.max(maxX, maxY) * 2));
+      let x = outsidePoint.x;
+      let y = outsidePoint.y;
+
+      // if (midX - x == 0) -> m == ±Inf -> minYx/maxYx == x (because value / ±Inf = ±0)
+      var m = (midY - y) / (midX - x);
+
+      if (x <= midX) { // check "left" side
+        var minXy = m * (minX - x) + y;
+        if (minY <= minXy && minXy <= maxY)
+          edgePoint =  {x: minX, y: minXy};
+      }
+
+      if (x >= midX) { // check "right" side
+        var maxXy = m * (maxX - x) + y;
+        if (minY <= maxXy && maxXy <= maxY)
+          edgePoint = {x: maxX, y: maxXy};
+      }
+
+      if (y <= midY) { // check "top" side
+        var minYx = (minY - y) / m + x;
+        if (minX <= minYx && minYx <= maxX)
+          edgePoint = {x: minYx, y: minY};
+      }
+
+      if (y >= midY) { // check "bottom" side
+        var maxYx = (maxY - y) / m + x;
+        if (minX <= maxYx && maxYx <= maxX)
+          edgePoint = {x: maxYx, y: maxY};
+      }
+
+      // edge case when finding midpoint intersection: m = 0/0 = NaN
+      if (x === midX && y === midY) edgePoint = {x: x, y: y};
+
+      return 2 * Math.sqrt(Math.pow((centerPoint.x - edgePoint.x),2)+Math.pow((centerPoint.y - edgePoint.y),2));
+
+    },
     generateCoords() {
       let pathArray = [];
 
@@ -156,9 +209,9 @@ export default {
       return pathArray;
     },
     getFillPoints() {
-      let extendPoint1 = this.movePoint(this.curve.startPoint, this.lineAngle, -(this.lineLength / 2));
-      let extendPoint2 = this.movePoint(this.curve.endPoint, this.lineAngle, this.lineLength / 2);
-      let normPoints = this.getPointsNormalToLine(extendPoint1, extendPoint2, this.lineLength);
+      let extendPoint1 = this.movePoint(this.curve.startPoint, this.lineAngle, -(this.lineLength / 20));
+      let extendPoint2 = this.movePoint(this.curve.endPoint, this.lineAngle, this.lineLength / 20);
+      let normPoints = this.getPointsNormalToLine(extendPoint1, extendPoint2, this.distanceToEdge());
 
       return [extendPoint2, normPoints.point2, normPoints.point1, extendPoint1];
     },
@@ -228,10 +281,11 @@ export default {
       if (this.$refs.linePath === event.target) {
         return;
       }
-      this.$emit('clickedOutside');
+      this.$emit('clickedOutside', event);
     }
   },
   mounted() {
+
     if(this.enableDetectClickOutside) {
       document.addEventListener("click", this.clickedOutside);
     }
@@ -266,7 +320,7 @@ export default {
 
 <style lang="stylus" type="text/stylus" scoped>
 
-.blob {
+.blob-svg {
   width 100%;
   height 100%;
 }
