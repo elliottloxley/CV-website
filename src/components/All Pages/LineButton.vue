@@ -1,25 +1,20 @@
 <template>
-<div class="line-button">
-  <div v-if="showLeftLine" class="line-connector left-middle"></div>
-  <div v-if="showRightLine" class="line-connector right-middle"></div>
-  <div v-if="showBottomLine" class="line-connector bottom-middle"></div>
-  <div v-if="showTopLine" class="line-connector top-middle"></div>
+<div :class="{'disable-animation' : !enableEnterAnimation}" ref="parent" class="line-button">
+  <div v-if="showLeftLine" :class="{'disable-animation' : !enableEnterAnimation}" class="line-connector left-middle"></div>
+  <div v-if="showRightLine" :class="{'disable-animation' : !enableEnterAnimation}" class="line-connector right-middle"></div>
+  <div v-if="showBottomLine" :class="{'disable-animation' : !enableEnterAnimation}" class="line-connector bottom-middle"></div>
+  <div v-if="showTopLine" :class="{'disable-animation' : !enableEnterAnimation}" class="line-connector top-middle"></div>
 
-  <div class="button-inner">
-    <svg :class="cornerAnimationEnded ? 'corner-finished' : ''" class="border-svg svg-corner corner-1" viewBox="0 0 100 100">
-      <path d="M50,0 h-50 v50"></path>
+  <div :class="{'disable-animation' : !enableEnterAnimation}" class="button-inner">
+    <svg :class="cornerClasses" class="corner corner-1" viewBox="0 0 100 100"></svg>
+    <svg :class="cornerClasses" class="corner corner-2" viewBox="0 0 100 100">
     </svg>
-    <svg :class="cornerAnimationEnded ? 'corner-finished' : ''" class="border-svg svg-corner corner-2" viewBox="0 0 100 100">
-      <path d="M50,0 h50 v50"></path>
+    <svg :class="cornerClasses" class="corner corner-3" viewBox="0 0 100 100">
     </svg>
-    <svg :class="cornerAnimationEnded ? 'corner-finished' : ''" class="border-svg svg-corner corner-3" viewBox="0 0 100 100">
-      <path d="M100,50 v50 h-50"></path>
+    <svg :class="cornerClasses" class="corner corner-4" viewBox="0 0 100 100">
     </svg>
-    <svg :class="cornerAnimationEnded ? 'corner-finished' : ''" class="border-svg svg-corner corner-4" viewBox="0 0 100 100">
-      <path d="M0,50 v50 h50"></path>
-    </svg>
-    <transition appear name="button">
-      <div class="button-content">{{content}}</div>
+    <transition appear :name="enableEnterAnimation ? 'button' : ''">
+      <div :class="{'disable-animation' : !enableEnterAnimation}" class="button-content">{{content}}</div>
     </transition>
   </div>
 </div>
@@ -38,11 +33,28 @@ name: "LineButton",
   },
   data() {
     return {
-      cornerAnimationEnded: false
+      cornerAnimationEnded: false,
+      isMounted: false,
+    }
+  },
+  methods: {
+    getHeight() {
+      return this.$refs.parent.clientHeight;
+    },
+    getWidth() {
+      return this.$refs.parent.clientWidth;
+    }
+  },
+  computed: {
+    cornerClasses() {
+      return {'corner-finished' : this.cornerAnimationEnded,
+        'disable-animation' : !this.enableEnterAnimation && !this.cornerAnimationEnded,
+        'corner-move' : this.isMounted};
     }
   },
   mounted() {
     setTimeout(() => {this.cornerAnimationEnded = true}, 910);
+    setTimeout(() => {this.isMounted = true;}, 50);
   }
 }
 </script>
@@ -67,6 +79,8 @@ $textGrowTime: 0.5s;
 $textAppearDelay: 0.8s;
 $textAppearTime: 0.5s;
 
+$cornerWidth: 2px;
+
 .line-button {
   position: relative;
 }
@@ -76,6 +90,8 @@ $textAppearTime: 0.5s;
   cursor: pointer;
   min-height: 30px;
   animation: buttonInnerSpin $buttonSpinTime $buttonSpinDelay;
+  box-sizing: border-box;
+  background-color: rgba(0,0,0,0.7);
 }
 
 .button-inner:hover .corner-1 {
@@ -96,10 +112,12 @@ $textAppearTime: 0.5s;
 
 .button-enter {
   font-size: 0;
+  color: transparent !important;
 }
 
 .disable-animation {
   animation: none !important;
+  transition: none !important;
 }
 
 .button-inner:hover .border-svg path {
@@ -111,9 +129,9 @@ $textAppearTime: 0.5s;
   align-items: center;
   justify-content: center;
   padding: 5px 15px;
-  color: transparent;
-  transition: font-size $textGrowTime $textGrowDelay;
-  animation: fontAppear $textAppearTime $textAppearDelay forwards;
+  color: inherit;
+  transition: font-size $textGrowTime $textGrowDelay, color $textAppearTime $textAppearDelay;
+  white-space: nowrap;
 }
 
 .border-svg {
@@ -132,37 +150,54 @@ $textAppearTime: 0.5s;
   transition: stroke 0.5s;
 }
 
+.corner {
+  position: absolute;
+  height: 25%;
+  pointer-events: none;
+  border-radius: 2px;
+  transition: transform $cornerGrowTime $cornerGrowDelay;
+}
+
+$translateMagnitude: 76%;
+
 .corner-1 {
   top: 0;
   left: 0;
-  animation: cornerAnimation $cornerGrowTime $cornerGrowDelay forwards;
-  transform: translate(50%, 50%);
+  border-left: solid white $cornerWidth;
+  border-top: solid white $cornerWidth;
+  transform: translate($translateMagnitude, $translateMagnitude);
 }
 
 .corner-2 {
   top: 0;
   right: 0;
-  animation: cornerAnimation $cornerGrowTime $cornerGrowDelay forwards;
-  transform: translate(-50%, 50%);
+  border-right: solid white $cornerWidth;
+  border-top: solid white $cornerWidth;
+  transform: translate(-$translateMagnitude, $translateMagnitude);
 }
 
 .corner-3 {
   bottom: 0;
   right: 0;
-  animation: cornerAnimation $cornerGrowTime $cornerGrowDelay forwards;
-  transform: translate(-50%, -50%);
+  border-right: solid white $cornerWidth;
+  border-bottom: solid white $cornerWidth;
+  transform: translate(-$translateMagnitude, -$translateMagnitude);
 }
 
 .corner-4 {
   bottom: 0;
   left: 0;
-  animation: cornerAnimation $cornerGrowTime $cornerGrowDelay forwards;
-  transform: translate(50%, -50%);
+  border-left: solid white $cornerWidth;
+  border-bottom: solid white $cornerWidth;
+  transform: translate($translateMagnitude, -$translateMagnitude);
+}
+
+.corner-move {
+  transform: translate(0,0);
 }
 
 .corner-finished {
-  animation: none;
-  transform: translate(0,0);
+  transition: transform 0.4s;
 }
 
 $lineConnectorSize: 15px;
@@ -263,24 +298,12 @@ $lineConnectorThickness: 2px;
   }
 }
 
-@keyframes cornerAnimation {
-  to {
-    transform: translate(0,0);
-  }
-}
-
 @keyframes buttonInnerSpin {
   from {
     transform: scale(0.1) rotate(-180deg);
   }
   to {
     transform: scale(1) rotate(0deg);
-  }
-}
-
-@keyframes fontAppear {
-  to {
-    color: inherit;
   }
 }
 

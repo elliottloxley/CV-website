@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import SlottedDiv from "@/components/All Pages/SlottedDiv";
-import Blob from "@/components/All Pages/Blob";
+import SlottedDiv from "@/components/old work/SlottedDiv";
+import Blob from "@/components/old work/Blob";
 export default {
   name: "SimpleBlobLink",
   components: {Blob, SlottedDiv},

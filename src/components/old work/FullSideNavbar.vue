@@ -35,8 +35,8 @@
 
 import PageNavbar from "@/components/All Pages/PageNavbar";
 import 'vue-md-icons/src/icons/settings'
-import CollapsibleSideNavbar from "@/components/All Pages/CollapsibleSideNavbar";
-import BlobLine from "@/components/All Pages/BlobLine";
+import CollapsibleSideNavbar from "@/components/old work/CollapsibleSideNavbar";
+import BlobLine from "@/components/old work/BlobLine";
 
 export default {
   name: 'FullSideNavbar',

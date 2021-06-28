@@ -1,22 +1,17 @@
 module.exports = {
-    vue: {
-        postcss: [require('autoprefixer')()],
-        autoprefixer: true
-    },
     module: {
-        rules: [
-            // ... other rules omitted
-
-            // this will apply to both plain `.scss` files
-            // AND `<style lang="scss">` blocks in `.vue` files
+        loaders: [
             {
-                test: /\.scss$/,
-                use: [
-                    'vue-style-loader',
-                    'css-loader',
-                    'sass-loader'
-                ]
+                test: /\.vue$/,
+                loader: 'vue'
             }
         ]
+    },
+    // vue-loader configurations
+    vue: {
+        // configure autoprefixer
+        autoprefixer: {
+            browsers: ['last 2 versions']
+        }
     }
 }

@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import Blob from "@/components/All Pages/Blob";
+import Blob from "@/components/old work/Blob";
 export default {
 name: "BlobButton",
   components: {Blob},

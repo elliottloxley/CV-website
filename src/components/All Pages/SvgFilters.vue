@@ -1,5 +1,5 @@
 <template>
-  <svg style="display:none">
+  <svg style="visibility: hidden" width="0" height="0">
     <defs>
       <filter x="0" y="0" id="connectElements">
         <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
@@ -52,9 +52,15 @@
         <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
       </filter>
       <radialGradient id="featherGradient">
-        <stop offset="40%" stop-color="black" />
-        <stop offset="100%" stop-color="white" />
+        <stop offset="30%" stop-color="black" />
+        <stop offset="100%" stop-color="rgba(0,0,0,0)" />
       </radialGradient>
+      <defs>
+        <linearGradient id="whiteToBlack">
+          <stop offset="50%" stop-color="white" />
+          <stop offset="50%" stop-color="black" />
+        </linearGradient>
+      </defs>
     </defs>
   </svg>
 </template>

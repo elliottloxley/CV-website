@@ -30,7 +30,7 @@
 
 <script>
 
-import BlobLine from "@/components/All Pages/BlobLine";
+import BlobLine from "@/components/old work/BlobLine";
 import MorphingIcon from "@/components/All Pages/MorphingIcon";
 
 export default {

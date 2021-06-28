@@ -1,95 +1,101 @@
 <template>
   <div class="home">
-    <div ref="lineBackground" class="line-background">
-      <line-path class="home-line home-main-line"
-                 @reachednode="hitNode"
-                 :path-coords="[[0,20],[40,20],[40,50],[60,50],[60,60],[60,100]]"
-                 :line-width="3"
-                 :animate-time="2.5"
-                 :animate-delay="0.8"
-                 :line-colour="'rgba(255,255,255,1)'"
-                 :parent-dimensions="[lineParentDimensions[0], lineParentDimensions[1]]"
-                 :line-join="'round'"
-                 :show-nodes="true"
-                 :excluded-nodes="[5]"
-                 :node-fill-colour="'black'"
-                 :node-stroke-width="10"
-                 :feather-node-radius="2.5"
-                 :nodes-to-feather="[0,1,2,3,4]"
-                 :node-size="['25px', '25px']"
-      ></line-path>
-      <line-path class="home-line home-work-line-offscreen-preview"
-                 :path-coords="[[100,40], [75,40], [75,60], [68,60]]"
-                 :line-width="1"
-                 :line-percent="workOffscreenPreviewPercent"
-                 :animate-time="0.7"
-                 :show-only-end-node="true"
-                 :transition-timing-function="'ease-out'"
-                 :line-colour="'rgba(255,255,255,0.3)'"
-                 :parent-dimensions="[lineParentDimensions[0], lineParentDimensions[1]]"
-                 :nodes-to-feather="[3]"
-                 :feather-node-radius="12">
-      </line-path>
-      <line-path class="home-line home-work-line-offscreen"
-                 v-if="showWorkLineOffscreen"
-                 :path-coords="[[68,60], [75,60], [75,40], [100,40]]"
-                 :line-width="3"
-                 :animate-time="0.5"
-                 :line-colour="'rgba(255,255,255,1)'"
-                 :nodes-to-feather="[0]"
-                 :feather-node-radius="12"
-                 :parent-dimensions="[lineParentDimensions[0], lineParentDimensions[1]]"
-                 :show-nodes="true"
-                 :node-stroke-width="10"
-                 :node-fill-colour="'black'"
-                 :node-size="['25px', '25px']"
-                 :line-join="'round'"
-                 :excluded-nodes="[0]"
-      ></line-path>
-      <line-path class="home-line home-work-line"
-                 v-if="displayWorkLine"
-                 @reachednode="workButtonCreated"
-                 :path-coords="[[60,60], [68,60]]"
-                 :line-width="3"
-                 :animate-time="0.5"
-                 :animate-delay="0.2"
-                 :line-colour="'rgba(255,255,255,1)'"
-                 :parent-dimensions="[lineParentDimensions[0], lineParentDimensions[1]]"
-                 :line-join="'round'"
-                 :show-nodes="true"
-                 :excluded-nodes="[0]"
-                 :node-advance-appear="{1 : 0.1}"
-                 :node-fill-colour="'black'"
-                 :node-stroke-width="13"
-                 :nodes-to-feather="[1]"
-                 :feather-node-radius="4"
-                 :feather-node-scale="workLineFeatherScale"
-                 :node-size="['30px', '30px']">
-        <template v-slot:[buttonsOnPath[0]]="">
-          <line-button style="color: white;font-size: 24px; width: min-content;"
-                       @mouseenter.native="workOffscreenPreviewPercent = 1;"
-                       @mouseleave.native="workOffscreenPreviewPercent = 0;"
-                       @click.native="workOffscreenPreviewPercent = 0;showWorkLineOffscreen = true; showButtonLineConnector = true"
-                       :show-left-line="true"
-                       :show-right-line="showButtonLineConnector"
-                       :enable-enter-animation="true"
-                       :content="'WORK'"></line-button>
-        </template>
-      </line-path>
-    </div>
-    <div class="content-foreground">
-      <div class="name-container">
-        <svg viewBox="0 0 100 20">
-          <text class="title-first" x="0" y="7" fill="white" font-size="8">ECL</text>
-          <text class="title-first" x="0" y="18.7" fill="white" font-size="8">WEB</text>
-          <rect data-v-8a9df0b8 x="18" y="9" width="65.5" height="2" fill="black"></rect>
-          <text class="title-second" x="20" y="15.9" fill="white" font-size="17">DESIGN</text>
-          <path d="M21,1 h-3 v18 h3 M80.5,1 h3 v18 h-3" stroke-linecap="square" stroke="white" stroke-width="0.7"></path>
-          <!--test lines -->
-          <path v-if="false" d="M12,10 v-3 6 M0,10 h100" stroke="red" stroke-width="0.5"></path>
-        </svg>
+    <div id="section1" class="section">
+      <div ref="lineBackground" class="line-background">
+        <line-path class="home-line home-main-line"
+                   @reachednode="hitNode"
+                   :path-coords="[[0,20],[30,20],[30,28],[30,38],[30,50],[50,50],[50,60],[50,70],[50,80],[50,100]]"
+                   :line-width="3"
+                   :animate-time="2"
+                   :animate-delay="0.8"
+                   :line-colour="'rgba(255,255,255,1)'"
+                   :line-join="'round'"
+                   :show-nodes="true"
+                   :excluded-nodes="[0,2,3,9]"
+                   :node-fill-colour="'black'"
+                   :node-stroke-width="10"
+                   :feather-node-radius="3"
+                   :feather-node-scale="1"
+                   :nodes-to-feather="[1,2,3,4,5,6,7,8]"
+                   :custom-feather-node-scale="{2: 0.5, 3:0.5}"
+                   :node-size="['25px', '25px']">
+          <template v-slot:[mainLineSlots[0]]="">
+            <text-with-connector
+                :connector-fill="'black'"
+                :connector-stroke="'rgba(255,255,255,0.8)'"
+                :connector-gap="50"
+                class="tagline">
+              <template #content>
+                <span>Professional Web Services</span>
+              </template>
+            </text-with-connector>
+          </template>
+          <template v-slot:[mainLineSlots[1]]="">
+            <text-with-connector
+                :connector-fill="'black'"
+                :entry-direction="'left'"
+                :connector-stroke="'rgba(255,255,255,0.8)'"
+                :connector-gap="50"
+                class="tagline">
+              <template #content>
+                <span>Experienced Design</span>
+              </template>
+            </text-with-connector>
+          </template>
+        </line-path>
+        <line-button-with-paths
+            v-if="contentDisplay[6]"
+            @clicked="navClicked('work')"
+            :relative-coord="[50,60]"
+            :entry-path="[[0,0], [5,0]]"
+            :exit-path="[[5,0], [20,0], [20,-15], [50,-15]]"
+            :button-index="1"
+            :anchor-entry-to-edge="true"
+            :content="'Previous Work'"
+            :entry-direction="'left'"
+            :exit-direction="'right'">
+        </line-button-with-paths>
+        <line-button-with-paths
+            v-if="contentDisplay[7]"
+            @clicked="navClicked('contact')"
+            :relative-coord="[50,70]"
+            :entry-path="[[0,0], [-5,0]]"
+            :exit-path="[[-5,0], [-25,0], [-25,15], [-50,15]]"
+            :button-index="1"
+            :exit-path-preview-time="0.8"
+            :exit-path-time="0.8"
+            :anchor-entry-to-edge="true"
+            :content="'Contact'"
+            :entry-direction="'right'"
+            :exit-direction="'left'">
+        </line-button-with-paths>
+        <line-button-with-paths
+            v-if="contentDisplay[8]"
+            :relative-coord="[50,80]"
+            :entry-path="[[0,0], [5,0]]"
+            :exit-path="[[5,0], [25,0], [25,8], [50,8]]"
+            :button-index="1"
+            :anchor-entry-to-edge="true"
+            :content="'Pricing and Rates'"
+            :entry-direction="'left'"
+            :exit-direction="'right'">
+        </line-button-with-paths>
+      </div>
+      <div class="content-foreground">
+        <div class="name-container">
+          <svg viewBox="0 0 100 20">
+            <text class="title-first" x="0" y="7" fill="white" font-size="8">ECL</text>
+            <text class="title-first" x="0" y="18.7" fill="white" font-size="8">WEB</text>
+            <rect data-v-8a9df0b8 x="18" y="9" width="65.5" height="2" fill="black"></rect>
+            <text class="title-second" x="20" y="15.9" fill="white" font-size="17">DESIGN</text>
+            <path d="M21,1 h-3 v18 h3 M80.5,1 h3 v18 h-3" stroke-linecap="square" stroke="white" stroke-width="0.7"></path>
+            <!--test lines -->
+            <path v-if="false" d="M12,10 v-3 6 M0,10 h100" stroke="red" stroke-width="0.5"></path>
+          </svg>
+        </div>
       </div>
     </div>
+    <div class="section" id="section2"></div>
   </div>
 </template>
 
@@ -102,13 +108,15 @@ import 'vue-md-icons/src/icons/person'
 import 'vue-md-icons/src/icons/call'
 import 'vue-md-icons/src/icons/clear'
 import LinePath from "@/components/All Pages/LinePath";
-import LineButton from "@/components/All Pages/LineButton";
+import LineButtonWithPaths from "@/components/All Pages/LineButtonWithPaths";
+import TextWithConnector from "@/components/All Pages/TextWithConnector";
 
 
 export default {
   name: "Home",
   components: {
-    LineButton,
+    TextWithConnector,
+    LineButtonWithPaths,
     LinePath,
   },
   data() {
@@ -117,13 +125,8 @@ export default {
       lineParentDimensions: [],
       displayLine: false,
       mousePosition: [],
-      displayWorkLine: false,
-      showWorkLineOffscreen: false,
-      workOffscreenPreviewPercent: 0,
-      showButtonLineConnector: false,
-      workLineFeatherScale: 0.3,
-      workLineFadeSize: 0,
-      buttonsOnPath: ['nodeSlot1', 'nodeSlot3']
+      contentDisplay: {6: false, 7: false, 8: false},
+      mainLineSlots: ['nodeSlot2', 'nodeSlot3']
     }
   },
   computed: {
@@ -133,13 +136,13 @@ export default {
       this.$delete(this.particles, id);
     },
     hitNode(index) {
-      if(index === 4) {
-        this.displayWorkLine = true;
+      if(index in this.contentDisplay) {
+        this.contentDisplay[index] = true;
       }
     },
-    workButtonCreated() {
-      setTimeout(() => {this.workLineFeatherScale = 3}, 400);
-    }
+    navClicked(path) {
+      setTimeout(() => {this.$router.push(path)}, 200);
+    },
 /*    mouseMove(event) {
       //this.mousePosition = [event.clientX, event.clientY];
 
@@ -153,9 +156,10 @@ export default {
     }*/
   },
   mounted() {
-    this.$set(this.particles, 1, 0);
-    this.lineParentDimensions = [this.$refs.lineBackground.clientWidth, this.$refs.lineBackground.clientHeight];
-    this.displayLine = true;
+    this.$nextTick(() => {
+      this.$set(this.particles, 1, 0);
+      this.displayLine = true;
+    });
   }
 }
 </script>
@@ -164,19 +168,20 @@ export default {
 
 @import "src/themes/sassAnimations.scss";
 
-.home {
-  background-color: black;
+.section {
+  width: 100vw;
+  height: 100vh;
 }
 
 .line-background {
   position: absolute;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 }
 
 .content-foreground {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   color: white;
 }
 
@@ -187,6 +192,16 @@ export default {
   width: 25%;
   font-family: "IBM Plex Mono";
   transform: translateY(-50%);
+}
+
+.tagline {
+  font-size: 26px;
+  font-weight: 300;
+}
+
+.tagline span {
+  white-space: nowrap;
+  color: white;
 }
 
 .title-first {
@@ -204,9 +219,4 @@ export default {
   width: 100%;
   height: 100%;
 }
-
-.home-main-line, .home-work-line {
-
-}
-
 </style>

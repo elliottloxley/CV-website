@@ -1,9 +1,7 @@
 <template>
 <div v-show="show" class="particle"
-  :style="{backgroundColor: startColour,
-  transition: particleTransition,
-  width: widthHeight[0] + 'px', height: widthHeight[1] + 'px',
-  transform: `translate3d(${currentPosition[0] - (widthHeight[0] / 2)}px, ${currentPosition[1]  - (widthHeight[1] / 2)}px, ${currentPosition[2]}px)`}">
+     :class="{'particle-fixed' : useFixedPositioning, 'end-colour' : colourChange}"
+     :style="particleStyle">
 </div>
 </template>
 
@@ -23,7 +21,8 @@ name: "Particle",
       currentPathMoveTime: 0,
       disableTransition: false,
       pathFirstMove: true,
-      show: true
+      show: true,
+      colourChange: false,
     }
   },
   props: {
@@ -36,7 +35,7 @@ name: "Particle",
     moveTime: {default:0.5, type:Number}, //in percent of life
     widthHeight: {default() {return [10,10]}, type:Array}, //in pixels
     startColour: {default: "white", type: String},
-    endColour: {default:"white", type: String},
+    endColour: {default:"", type: String},
     colourTime: {default: 0, type:Number}, //in percent of life
     endPointAttractMagnitude: {default: 1, type:Number},
     enableDriftMode: {default: false, type:Boolean},
@@ -54,14 +53,26 @@ name: "Particle",
     consistentSpeedNodeDelay: {default: 0, type:Number}, //used with enablePathConsistentSpeed, delay before traveling between each node
     transitionTimingFunction: {default: 'ease-out', type:String},
     enterExitTransitionTiming: {default: 0.5, type:Number},
+    useFixedPositioning: {default: false, type: Boolean}, //
   },
   computed: {
-    particleTransition() {
-      return `transform ${this.enablePathMode ? this.currentPathMoveTime : this.moveTimeSeconds}s ${this.enablePathMode ? 0 : this.hangTimeSeconds}s ${this.transitionTimingFunction},
-          background-color ${this.colourTimeSeconds}s,
-          width ${this.enterExitTransitionTiming}s,
-          height ${this.enterExitTransitionTiming}s,
-          opacity ${this.enterExitTransitionTiming}s`
+    cssVars() {
+      return {
+        '--start-colour' : this.startColour,
+        '--end-colour' : this.endColour,
+        '--move-time' : `${this.enablePathMode ? this.currentPathMoveTime : this.moveTimeSeconds}s`,
+        '--hang-time' : `${this.enablePathMode ? 0 : this.hangTimeSeconds}s`,
+        '--timing-function' : this.transitionTimingFunction,
+        '--background-color-time' : `${this.colourTimeSeconds}s`,
+        '--transition-time' : `${this.enterExitTransitionTiming}s`,
+        '--width' : this.widthHeight[0] + 'px',
+        '--height' : this.widthHeight[1] + 'px',
+      }
+    },
+    particleStyle() {
+      return {...this.cssVars,
+        transform: `translate3d(${this.currentPosition[0] - (this.widthHeight[0] / 2)}px,
+        ${this.currentPosition[1]  - (this.widthHeight[1] / 2)}px, ${this.currentPosition[2]}px)`};
     },
     hangTimeSeconds() {
       return this.lifetime * this.hangTime;
@@ -180,6 +191,10 @@ name: "Particle",
         this.currentPosition.splice(1, 1, this.currentPosition[1] + (this.distanceToEndPoint[1] * this.endPointAttractMagnitude));
         this.currentPosition.splice(2, 1, this.currentPosition[2] + (this.distanceToEndPoint[2] * this.endPointAttractMagnitude));
       }
+
+      if(this.endColour !== "") {
+        this.colourChange = true;
+      }
     }, 10);
 
     if(this.lifetime >= 0) {
@@ -200,7 +215,23 @@ name: "Particle",
 
 .particle {
   position: absolute;
+  pointer-events: none;
   border-radius: 1000px;
+  width: var(--width);
+  height: var(--height);
+  background-color: var(--start-colour);
+  transition: transform var(--move-time) var(--hang-time) var(--timing-function),
+    background-color var(--background-color-time), width var(--transition-time),
+    height var(--transition-time),
+    opacity var(--transition-time);
+}
+
+.particle-fixed {
+  position: fixed;
+}
+
+.end-colour {
+  background-color: var(--end-colour);
 }
 
 </style>

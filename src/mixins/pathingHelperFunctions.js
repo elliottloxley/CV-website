@@ -1,3 +1,5 @@
+import {svgPathProperties} from "svg-path-properties";
+
 const pathingHelperFunctions = {
     methods: {
         squaredPointDistance(coord1, coord2) {
@@ -75,6 +77,13 @@ const pathingHelperFunctions = {
 
             return nodePercentages;
         },
+        getNormalisedVector(vector) {
+            let magnitude = Math.sqrt(Math.pow(vector[0], 2) + Math.pow(vector[1], 2));
+            return [vector[0] / magnitude, vector[1] / magnitude];
+        },
+        getPropertiesFromPathString(path) {
+            return new svgPathProperties(path);
+        }
     }
 }
 

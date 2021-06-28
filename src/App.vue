@@ -1,6 +1,8 @@
 <template>
-  <div id="app" :class="page" :style="{backgroundColor: $root.currentTheme.background.base}">
-    <particle-cloud ref="particleBG" style="position: fixed; width:100vw; height:100vh;"
+  <div v-if="displayPage" id="app" :class="page" :style="{backgroundColor: $root.currentTheme.background.base}">
+    <SvgFilters></SvgFilters>
+    <particle-cloud v-if="true" ref="particleBG" style="position: fixed; width:100vw; height:100vh;"
+                    class="particle-cloud"
                     :enable-random-spawning="true"
                     :enable-random-depth="true"
                     :enable-particle-drift-mode="true"
@@ -12,6 +14,7 @@
                     :particle-drift-timing="1"
                     :particle-height="10"
                     :particle-width="10"
+                    :particle-use-fixed-positioning="true"
                     :z-axis-max="10"
                     :z-axis-min="-50"
                     :perspective-origin="cloudPerspective"
@@ -24,10 +27,11 @@
                     :spawn-speed="3"
                     :particle-life-time="10"
                     :lifetime-variance="0.1"></particle-cloud>
-    <transition mode="out-in" name="fade" appear>
-      <router-view class="page-view"></router-view>
+    <transition :name="currentTransition" appear>
+      <keep-alive>
+        <router-view :key="$route.fullPath" class="page-view"></router-view>
+      </keep-alive>
     </transition>
-    <SvgFilters></SvgFilters>
   </div>
 </template>
 <script>
@@ -35,7 +39,6 @@
 import IconPathData from "@/AnimatedIcon/IconPathData";
 import SvgFilters from "@/components/All Pages/SvgFilters";
 import 'vue-md-icons/src/icons/settings'
-import PageContents from "@/components/pages/PageContents";
 import ParticleCloud from "@/components/All Pages/ParticleCloud";
 
 export default {
@@ -49,12 +52,31 @@ export default {
       page: "home",
       settingsIcon: IconPathData.settingsToClose,
       settingsOpen: false,
-      cloudPerspective: 'center',
+      basePerspective: [50,50],
+      currentPerspective: [50,50],
+      currentTransition: '',
+      perspectiveShiftX: 40,
+      perspectiveShiftY: 40,
+      displayPage: true,
     }
   },
   watch: {
-    $route(to) {
+    $route(to, from) {
+      let differenceX = from.meta.pagePosition[0] - to.meta.pagePosition[0];
+      let differenceY = from.meta.pagePosition[1] - to.meta.pagePosition[1];
+
+      let shiftX = differenceX * this.perspectiveShiftX;
+      let shiftY = differenceY * this.perspectiveShiftY;
+
+      if(differenceX < 0) {
+        this.currentTransition = 'slide-left';
+      }
+      else if(differenceX > 0) {
+        this.currentTransition = 'slide-right';
+      }
+
       this.page = to.name;
+      this.currentPerspective = [this.currentPerspective[0] + shiftX, this.currentPerspective[1] + shiftY];
     }
   },
   methods: {
@@ -63,14 +85,9 @@ export default {
     },
   },
   computed: {
-    pageContent() {
-      if(PageContents[this.page]) {
-        return PageContents[this.page];
-      }
-      else {
-        return [];
-      }
-    }
+    cloudPerspective() {
+      return `${this.currentPerspective[0]}% ${this.currentPerspective[1]}%`
+    },
   },
   mounted() {
     this.page = this.$route.name;
@@ -78,69 +95,85 @@ export default {
 }
 </script>
 
-<style lang="stylus" type="text/stylus">
-
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
-@import "themes/variables.styl";
-
-* { -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+<style lang="scss">
 
 html, body {
-  width 100%;
-  height 100%;
-  margin 0;
-  padding 0;
-  font-family "Open Sans", "sans-serif";
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", "sans-serif";
+  font-weight: 300;
   overflow-x: hidden;
 }
 
 #app {
-  height 100%;
-  transition background-color 0.8s;
-  position relative;
-  z-index 0;
+  height: 100%;
+  transition: background-color 0.8s;
+  position: relative;
+  z-index: 0;
+  display: flex;
 }
 
-.settings-panel {
-  position fixed;
-  width 6rem; 
-  height 6rem;
-  top 0;
-  right 0;
-  z-index 3;
+.particle-cloud {
+  transition: perspective-origin 0.8s;
 }
 
 .page-view {
-  z-index 1;
-}
-
-.fade-enter-active {
-  animation fade-in 0.8s;
-}
-
-.fade-leave-active {
-  animation fade-out 0.8s;
 }
 
 .nav-open {
-  transform translateX(0);
+  transform: translateX(0);
 }
 
-@keyframes fade-in {
+.slide-left-enter-active {
+  animation: slide-in-left 1s;
+}
+
+.slide-left-leave-active {
+  animation: slide-out-left 1s;
+}
+
+@keyframes slide-in-left {
   from {
-    opacity 0;
+    transform: translateX(100%);
   }
   to {
-    opacity 1;
+    transform: translateX(0);
   }
 }
 
-@keyframes fade-out {
+@keyframes slide-out-left {
   from {
   }
   to {
-    opacity 0;
+    transform: translateX(-100%);
   }
 }
+
+.slide-right-enter-active {
+  animation: slide-in-right 1s;
+}
+
+.slide-right-leave-active {
+  animation: slide-out-right 1s;
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out-right {
+  from {
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
 </style>

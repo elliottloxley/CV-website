@@ -8,7 +8,9 @@
     :enter-class="appearClass"
     :leave-active-class="leaveActiveClass">
     <particle v-for="particle in particleCoords"
+              class="particle"
               :id="particle.id"
+              :use-fixed-positioning="particleUseFixedPositioning"
               :key="particle.id"
               :width-height="[particleWidth, particleHeight]"
               :start-point3d="startPoint(particle)"
@@ -80,6 +82,7 @@ name: "ParticleCloud",
     particleStep: {default: 0.1, type: Number}, //percentage of circle
     particleWidth: {default: 10, type: Number},
     particleHeight: {default: 10, type: Number},
+    particleUseFixedPositioning: {default: false, type: Boolean}, //
     enableDirectionReverse: {default: false, type: Boolean},
     endPosition: {default() {return [50, 50, 50]}, type:Array}, //end position of particle in percent
     centerPosition: {default() {return [50,50, 50]}, type: Array},
@@ -176,7 +179,9 @@ name: "ParticleCloud",
       }
       else {
         this.intervalHandle = setInterval(() => {
-          this.spawnOnTimer(this.maxParticles - this.particleCoords.length, this.timeBetweenPerSpawns);
+          if(this.maxParticles > this.particleCoords.length) {
+            this.spawnOnTimer(this.maxParticles - this.particleCoords.length, this.timeBetweenPerSpawns);
+          }
         }, 200);
       }
     },
@@ -340,7 +345,11 @@ name: "ParticleCloud",
 
 .particle-cloud {
   position: relative;
-  //transition: perspective-origin 0.05s;
+  pointer-events: none;
+}
+
+.particle {
+  pointer-events: none;
 }
 
 .appear-grow {

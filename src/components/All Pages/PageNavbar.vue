@@ -39,7 +39,7 @@
 
 <script>
 
-import BlobButton from "@/components/All Pages/BlobButton";
+import BlobButton from "@/components/old work/BlobButton";
 import Icon from 'vue-md-icons/src/components/Icon'
 import 'vue-md-icons/src/icons/home'
 import 'vue-md-icons/src/icons/menu'
@@ -48,7 +48,7 @@ import 'vue-md-icons/src/icons/person'
 import 'vue-md-icons/src/icons/call'
 import 'vue-md-icons/src/icons/clear'
 import IconPathData from '@/AnimatedIcon/IconPathData';
-import BlobPanelButton from "@/components/All Pages/BlobPanelButton";
+import BlobPanelButton from "@/components/old work/BlobPanelButton";
 
 export default {
   name: "PageNavbar",
