@@ -14,7 +14,7 @@
                    :excluded-nodes="[0,2,3,9]"
                    :node-fill-colour="'black'"
                    :node-stroke-width="10"
-                   :feather-node-radius="3"
+                   :feather-node-radius="30"
                    :feather-node-scale="1"
                    :nodes-to-feather="[1,2,3,4,5,6,7,8]"
                    :custom-feather-node-scale="{2: 0.5, 3:0.5}"
@@ -95,7 +95,14 @@
         </div>
       </div>
     </div>
-    <div class="section" id="section2"></div>
+    <div class="section" id="section2">
+      <div class="line-background">
+        <line-path :path-coords="[[50,0],[50,100]]"
+                   :line-width="3"
+                   id="section2Line"
+                   class="home-line"></line-path>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -169,6 +176,7 @@ export default {
 @import "src/themes/sassAnimations.scss";
 
 .section {
+  position: relative;
   width: 100vw;
   height: 100vh;
 }

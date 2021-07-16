@@ -1,6 +1,6 @@
 <template>
   <div ref="parent" class="line-path">
-    <svg v-if="parentDimensions.length > 0" class="line-svg" preserveAspectRatio="none"  :viewBox="`0 0 ${viewBoxWidth} ${viewBoxHeight}`">
+    <svg v-if="parentWidth > -1 && this.parentHeight > -1" class="line-svg" preserveAspectRatio="none"  :viewBox="`0 0 ${viewBoxWidth} ${viewBoxWidth}`">
       <path ref="linePath"
             :d="svgPath"
             vector-effect="non-scaling-stroke"
@@ -9,38 +9,38 @@
             :stroke-linejoin="lineJoin"
             :style="disableAnimation ? {} : {strokeDasharray: lineLength, strokeDashoffset: currentOffset,
                       transition: initialised ? `stroke-dashoffset ${animateTime}s ${showNodes ? 'linear' : transitionTimingFunction}` : ''}"></path>
-      <path v-for="index in nodesToFeather"
-            :key="index"
-            :d="nodeFeatherPath(index)"
-            :width="featherNodeWidthHeight[0]"
-            :height="featherNodeWidthHeight[1]"
-            fill="none"
-            class="node-feather"
-            vector-effect="non-scaling-stroke"
-            :stroke-width="lineWidth * 2"
-            :style="nodeFeatherStyle(index)"></path>
     </svg>
-      <div v-for="(node, index) in nodes"
-           :key="index"
-           class="node-container"
-           :style="{left: `${node.coord[0]}%`, top: `${node.coord[1]}%`}">
-        <transition appear :name="disableAnimation ? '' : 'node-grow'">
-          <svg v-if="!node.disableDefault" :style="{width: nodeSize[0], height: nodeSize[1],
-                   animationDelay: nodeAppearDelay}"
-               :viewBox="`${(-nodeStrokeWidth/2) - 1} ${(-nodeStrokeWidth/2) - 1}
-                   ${100 + (nodeStrokeWidth) + 2} ${100 + (nodeStrokeWidth) + 2}`"
-               class="node-svg">
-            <path
-                :d="nodePath"
-                :fill="nodeFillColour"
-                :stroke-width="nodeStrokeWidth"
-                stroke-linejoin="round"
-                :stroke="nodeStrokeColour"></path>
-          </svg>
-        </transition>
-        <slot :name="`nodeSlot${node.index}`">
-        </slot>
-      </div>
+    <svg v-if="parentWidth > -1 && this.parentHeight > -1" class="feather-node-svg" preserveAspectRatio="none" :viewBox="`0 0 ${parentWidth} ${parentHeight}`">
+      <circle v-for="index in nodesToFeather"
+              :key="index"
+              :cx="relativePathCoords[index][0] + '%'"
+              :cy="relativePathCoords[index][1] + '%'"
+              :r="featherNodeRadius"
+              fill="none"
+              class="node-feather"
+              :style="nodeFeatherStyle(index)"></circle>
+    </svg>
+    <div v-for="(node, index) in nodes"
+         :key="index"
+         class="node-container"
+         :style="{left: `${node.coord[0]}%`, top: `${node.coord[1]}%`}">
+      <transition appear :name="disableAnimation ? '' : 'node-grow'">
+        <svg v-if="!node.disableDefault" :style="{width: nodeSize[0], height: nodeSize[1],
+                 animationDelay: nodeAppearDelay}"
+             :viewBox="`${(-nodeStrokeWidth/2) - 1} ${(-nodeStrokeWidth/2) - 1}
+                 ${100 + (nodeStrokeWidth) + 2} ${100 + (nodeStrokeWidth) + 2}`"
+             class="node-svg">
+          <path
+              :d="nodePath"
+              :fill="nodeFillColour"
+              :stroke-width="nodeStrokeWidth"
+              stroke-linejoin="round"
+              :stroke="nodeStrokeColour"></path>
+        </svg>
+      </transition>
+      <slot :name="`nodeSlot${node.index}`">
+      </slot>
+    </div>
   </div>
 </template>
 
@@ -48,6 +48,7 @@
 import pathingHelperFunctions from "@/mixins/pathingHelperFunctions";
 import timingHelperFunctions from "@/mixins/timingHelperFunctions";
 import uniqueId from "@/mixins/uniqueId";
+import {debounce} from "debounce";
 
 export default {
   name: "LinePath",
@@ -59,9 +60,11 @@ export default {
       viewBoxHeight: 100,
       featherID: 'featherNode' + this.getUniqueId(),
       nodes: [],
-      parentDimensions: [],
+      parentWidth: -1,
+      parentHeight: -1,
       animateStart: false,
-      initialised: false
+      initialised: false,
+      resizeListener: null,
     }
   },
   props: {
@@ -103,17 +106,6 @@ export default {
       }, delay + 10);
 
       setTimeout(() => {this.initialised = true;}, 10);
-    },
-    getNodeDelayCumulative(nodeIndex) { //returns summed node delays up to index
-      let delay = 0;
-
-      for (let i = 1; i <= nodeIndex; i++) {
-
-        let delayAdvance = this.getNodeAdvance(i);
-        delay += this.getNodeDelay(i) - delayAdvance;
-      }
-
-      return delay;
     },
     getNodeAdvance(index) {
       if(this.nodeAdvanceAppear[index]) {
@@ -215,6 +207,13 @@ export default {
         this.createNode(this.nodeCoords[index], indexNum, 0);
       }
     },
+    featherNodeSvgViewbox() {
+      return `0 0 ${this.parentWidth} ${this.parentHeight}`;
+    },
+    onResize() {
+      this.parentWidth = this.$refs.parent.clientWidth;
+      this.parentHeight = this.$refs.parent.clientHeight;
+    },
   },
   computed: {
     svgPath() {
@@ -266,8 +265,8 @@ export default {
       let coords = [];
 
       for(let i = 0; i < this.relativePathCoords.length; i++) {
-        coords.push([(this.relativePathCoords[i][0] / 100) * this.parentDimensions[0],
-                      (this.relativePathCoords[i][1] / 100) * this.parentDimensions[1]])
+        coords.push([(this.relativePathCoords[i][0] / 100) * this.parentWidth,
+                      (this.relativePathCoords[i][1] / 100) * this.parentHeight])
       }
 
       return coords;
@@ -283,7 +282,7 @@ export default {
       return (this.animateStart ? (this.lineLength * (1-this.linePercent)) : this.lineLength);
     },
     scaleMultiplier() {
-      return Math.max(this.parentDimensions[0], this.parentDimensions[1]) / this.viewBoxWidth;
+      return Math.max(this.parentWidth, this.parentHeight) / this.viewBoxWidth;
     },
     lastNodeIndex() {
       return this.pathCoords.length - 1;
@@ -312,16 +311,23 @@ export default {
     featherNodeWidthHeight() {
       let radiusPercent = (this.featherNodeRadius / 1000);
 
-      return [radiusPercent * this.parentDimensions[1], radiusPercent * this.parentDimensions[0]];
+      return [radiusPercent * this.parentHeight, radiusPercent * this.parentWidth];
     }
   },
   mounted() {
     this.$nextTick(() => {
-      this.parentDimensions = [this.$refs.parent.clientWidth, this.$refs.parent.clientHeight];
+      this.parentWidth = this.$refs.parent.clientWidth;
+      this.parentHeight = this.$refs.parent.clientHeight;
       if(this.start) {
         this.initialise();
       }
     });
+  },
+  created() {
+    this.resizeListener = window.addEventListener('resize', debounce(() => {this.onResize()}, 200));
+  },
+  destroyed() {
+    this.resizeListener.removeEventListener();
   },
   watch: {
     linePercent() {
@@ -338,7 +344,7 @@ export default {
       if(val) {
         this.initialise();
       }
-    }
+    },
   }
 }
 </script>
@@ -370,7 +376,15 @@ export default {
 .node-feather {
   transform-origin: 50% 50%;
   transform-box: fill-box;
-  stroke: url(#featherGradient);
+  fill: url(#featherGradient);
+}
+
+.feather-node-svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .node-transition-disable {

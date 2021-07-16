@@ -1,5 +1,5 @@
 <template>
-  <div v-if="displayPage" id="app" :class="page" :style="{backgroundColor: $root.currentTheme.background.base}">
+  <div v-if="displayPage" id="app" :class="page" :style="cssVars">
     <SvgFilters></SvgFilters>
     <particle-cloud v-if="true" ref="particleBG" style="position: fixed; width:100vw; height:100vh;"
                     class="particle-cloud"
@@ -88,6 +88,11 @@ export default {
     cloudPerspective() {
       return `${this.currentPerspective[0]}% ${this.currentPerspective[1]}%`
     },
+    cssVars() {
+      return {
+        '--bg-color' : this.$root.currentTheme.background.base,
+      }
+    }
   },
   mounted() {
     this.page = this.$route.name;
@@ -99,16 +104,16 @@ export default {
 
 html, body {
   width: 100%;
-  height: 100%;
   margin: 0;
   padding: 0;
   font-family: "Open Sans", "sans-serif";
   font-weight: 300;
   overflow-x: hidden;
+  background-color: var(--bg-color);
 }
 
 #app {
-  height: 100%;
+  height: auto;
   transition: background-color 0.8s;
   position: relative;
   z-index: 0;
@@ -117,6 +122,7 @@ html, body {
 
 .particle-cloud {
   transition: perspective-origin 0.8s;
+  background-color: var(--bg-color);
 }
 
 .page-view {

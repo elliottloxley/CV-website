@@ -9,9 +9,10 @@
                :animate-time="exitPathPreviewTime"
                :transition-timing-function="'ease-out'"
                :line-colour="'rgba(255,255,255,0.3)'"
-               :nodes-to-feather="this.previewReverse ? [exitPreviewPath.length - 1] : [0]"
-               :feather-node-scale="buttonExpanded ? featherExitEndScale : featherStartScale"
-               :feather-node-radius="featherStartRadius">
+               :nodes-to-feather="previewReverse ? [exitPreviewPath.length - 1] : [0]"
+               :custom-feather-node-offset="exitPreviewFeatherOffset"
+               :feather-node-scale="displayExitLine ? 0.01 : 1"
+               :feather-node-radius="featherStartRadius * 4">
     </line-path>
     <line-path class="line exit-line"
                v-if="displayExitLine && shouldDisplay"
@@ -26,7 +27,8 @@
                :line-join="'round'"
                :nodes-to-feather="[0]"
                :feather-node-radius="featherStartRadius"
-               :feather-node-scale="buttonExpanded || disableEntryAnimation ? featherExitEndScale : featherStartScale"
+               :custom-feather-node-offset="exitFeatherOffset"
+               :feather-node-scale="buttonExpanded || disableEntryAnimation ? featherEntryEndScale : featherStartScale"
     ></line-path>
     <line-path class="line entry-line"
                v-if="shouldDisplay"
@@ -46,8 +48,8 @@
                :node-stroke-width="13"
                :disable-animation="disableEntryAnimation"
                :nodes-to-feather="[entryPath.length - 1]"
-               :custom-feather-node-offset="entryFeatherOffset"
                :feather-node-radius="featherStartRadius"
+               :custom-feather-node-offset="entryFeatherOffset"
                :feather-node-scale="buttonExpanded || disableEntryAnimation ? featherEntryEndScale : featherStartScale"
                :node-size="['30px', '30px']">
       <template v-slot:[buttonNodeIndex]="">
@@ -74,6 +76,7 @@
 <script>
 import LinePath from "@/components/All Pages/LinePath";
 import LineButton from "@/components/All Pages/LineButton";
+import {debounce} from "debounce";
 export default {
   name: "LineButtonWithPaths",
   components: {LineButton, LinePath},
@@ -85,7 +88,7 @@ export default {
       exitLinePreviewPercent: 0,
       displayEntryLine: false,
       displayExitLine: false,
-      featherStartRadius: 4,
+      featherStartRadius: 18,
       featherStartScale: 1,
       buttonExpanded: false,
       showleft: false,
@@ -114,7 +117,7 @@ export default {
     exitPathTime: {default: 0.5, type:Number},
     entryPathTime: {default: 0.5, type:Number},
     relativeCoord: {default() {return [0,0]}, type:Array}, //added to path coords before any calculations
-    anchorEntryToEdge: {default: false, type:Boolean}, //the line ends at the button edge instead of middle
+    anchorEntryToEdge: {default: true, type:Boolean}, //the line ends at the button edge instead of middle
     forceShowExitLine: {default: false, type: Boolean}, //
     disableEntryAnimation: {default: false, type: Boolean}, //
   },
@@ -140,14 +143,11 @@ export default {
     getFeatherScale(direction, multiplier) {
 
       if (direction === 'left' || direction === 'right') {
-
-        let percent = this.buttonPercentWidth();
-        return (percent / (this.featherStartRadius / 100)) * multiplier;
+        return this.featherStartScale * multiplier;
       }
       else {
 
-        let percent = this.buttonPercentHeight();
-        return (percent / (this.featherStartRadius / 100)) * multiplier;
+        return this.featherStartScale * (multiplier / 2);
       }
     },
     getShiftedPath(path, x, y) {
@@ -158,7 +158,11 @@ export default {
       }
 
       return shiftedPath;
-    }
+    },
+    onResize() {
+      this.parentWidth = this.$refs.parent.clientWidth;
+      this.parentHeight = this.$refs.parent.clientHeight;
+    },
   },
   computed: {
     exitPathComputed() {
@@ -166,16 +170,16 @@ export default {
         if (this.anchorEntryToEdge) {
           switch (this.entryDirection) {
             case 'left': {
-              return this.getShiftedPath(this.exitPath, (this.buttonPercentWidth() * 100) / 2, 0);
+              return this.getShiftedPath(this.exitPath, (this.buttonPercentWidth() * 100), 0);
             }
             case 'right': {
-              return this.getShiftedPath(this.exitPath, -(this.buttonPercentWidth() * 100) / 2, 0);
+              return this.getShiftedPath(this.exitPath, -(this.buttonPercentWidth() * 100), 0);
             }
             case 'top': {
-              return this.getShiftedPath(this.exitPath, 0, (this.buttonPercentHeight() * 100) / 2);
+              return this.getShiftedPath(this.exitPath, 0, (this.buttonPercentHeight() * 100));
             }
             case 'bottom': {
-              return this.getShiftedPath(this.exitPath, 0, -(this.buttonPercentHeight() * 100) / 2);
+              return this.getShiftedPath(this.exitPath, 0, -(this.buttonPercentHeight() * 100));
             }
           }
         }
@@ -185,23 +189,30 @@ export default {
     },
     entryFeatherOffset() {
       if (this.anchorEntryToEdge) {
+        let magnitude = 10;
         switch (this.entryDirection) {
           case 'left': {
-            return {[this.entryPath.length - 1]: [25,0]};
+            return {[this.entryPath.length - 1]: [magnitude,0]};
           }
           case 'right': {
-            return {[this.entryPath.length - 1]: [-25,0]};
+            return {[this.entryPath.length - 1]: [-magnitude,0]};
           }
           case 'top': {
-            return {[this.entryPath.length - 1]: [0,25]};
+            return {[this.entryPath.length - 1]: [0,magnitude]};
           }
           case 'bottom': {
-            return {[this.entryPath.length - 1]: [0,-25]};
+            return {[this.entryPath.length - 1]: [0,-magnitude]};
           }
         }
       }
 
       return {};
+    },
+    exitFeatherOffset() {
+      return {0 : [-this.entryFeatherOffset[this.entryPath.length - 1][0], 0]};
+    },
+    exitPreviewFeatherOffset() {
+      return {[this.exitPathComputed.length -1] : [-this.entryFeatherOffset[this.entryPath.length - 1][0], 0]};
     },
     exitPreviewPath() {
       if(this.previewReverse) {
@@ -239,7 +250,7 @@ export default {
     },
     featherExitEndScale() {
       if(this.mounted) {
-        return this.getFeatherScale(this.exitDirection, 2);
+        return this.getFeatherScale(this.exitDirection, 3);
       }
 
       return 1;
@@ -247,6 +258,12 @@ export default {
     shouldDisplay() {
       return this.parentDimensions.length > 0;
     }
+  },
+  created() {
+    this.resizeListener = window.addEventListener('resize', debounce(() => {this.onResize()}, 200));
+  },
+  destroyed() {
+    this.resizeListener.removeEventListener();
   },
   mounted() {
       this.$nextTick(() => {
