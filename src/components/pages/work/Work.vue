@@ -6,9 +6,9 @@
 <script>
 
 export default {
-name: "Work",
+  name: 'Work',
   components: {},
-  data() {
+  data () {
     return {
 
     }

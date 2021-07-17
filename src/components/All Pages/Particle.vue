@@ -6,208 +6,204 @@
 </template>
 
 <script>
-import pathingHelperFunctions from "@/mixins/pathingHelperFunctions";
+import pathingHelperFunctions from '@/mixins/pathingHelperFunctions'
 
 export default {
-name: "Particle",
+  name: 'Particle',
   mixins: [pathingHelperFunctions],
-  data() {
+  data () {
     return {
       currentPosition: !this.enablePathMode ? this.startPoint3d : [(this.pathCoords[0][0] / 100) * this.parentDimensions[0],
-                        (this.pathCoords[0][1] / 100) * this.parentDimensions[1],
-                        (this.pathCoords[0][2] / 100) * this.parentDimensions[2]],
+        (this.pathCoords[0][1] / 100) * this.parentDimensions[1],
+        (this.pathCoords[0][2] / 100) * this.parentDimensions[2]],
       driftIntervalHandle: null,
       opacityTime: 0,
       currentPathMoveTime: 0,
       disableTransition: false,
       pathFirstMove: true,
       show: true,
-      colourChange: false,
+      colourChange: false
     }
   },
   props: {
-    startPoint3d: {required:true, type:Array, validator(value) {return value.length === 3}}, //3d coordinate
-    endPoint3d: {default() {return [50,50,0]}, type:Array, validator(value) {return value.length === 3}},
-    parentDimensions: {required:true, type:Array, validator(value) {return value.length === 3}},
-    id: {required: true, type: Number}, //
-    lifetime: {required: true, type:Number}, // in seconds, -1 for infinite
-    hangTime: {default:0, type:Number}, //in percent of life
-    moveTime: {default:0.5, type:Number}, //in percent of life
-    widthHeight: {default() {return [10,10]}, type:Array}, //in pixels
-    startColour: {default: "white", type: String},
-    endColour: {default:"", type: String},
-    colourTime: {default: 0, type:Number}, //in percent of life
-    endPointAttractMagnitude: {default: 1, type:Number},
-    enableDriftMode: {default: false, type:Boolean},
-    driftMaxMagnitude: {default: 0.1, type:Number},
-    driftInterval: {default: 0.1, type:Number},
-    driftTiming: {default: 0.1, type:Number},
-    enablePathMode: {default: false, type:Boolean}, //path mode ignores start point prop, treat the first element of pathCoords as start point instead
-    pathCoords: {default() {return [[0,0,0]]}, type:Array}, //units: container percentage
-    pathTimings: {default() {return [0.1]}, type:Array}, //
-    nodeDelays: {default() {return [0]}, type:Array}, //
-    pathUseSeconds: {default: false, type:Boolean}, //whether path timings should use seconds rather than proportions of lifetime
-    pathBackToStart: {default: false, type:Boolean}, //whether the particle paths backwards to start position at end of path
-    enablePathConsistentSpeed: {default: false, type:Boolean}, //ignores path timings, instead ensures a consistent speed along the whole path
-    consistentSpeedPathTime: {default: 0, type:Number}, //used with enablePathConsistentSpeed, time for the particle to complete one path cycle
-    consistentSpeedNodeDelay: {default: 0, type:Number}, //used with enablePathConsistentSpeed, delay before traveling between each node
-    transitionTimingFunction: {default: 'ease-out', type:String},
-    enterExitTransitionTiming: {default: 0.5, type:Number},
-    useFixedPositioning: {default: false, type: Boolean}, //
+    startPoint3d: { required: true, type: Array, validator (value) { return value.length === 3 } }, // 3d coordinate
+    endPoint3d: { default () { return [50, 50, 0] }, type: Array, validator (value) { return value.length === 3 } },
+    parentDimensions: { required: true, type: Array, validator (value) { return value.length === 3 } },
+    id: { required: true, type: Number }, //
+    lifetime: { required: true, type: Number }, // in seconds, -1 for infinite
+    hangTime: { default: 0, type: Number }, // in percent of life
+    moveTime: { default: 0.5, type: Number }, // in percent of life
+    widthHeight: { default () { return [10, 10] }, type: Array }, // in pixels
+    startColour: { default: 'white', type: String },
+    endColour: { default: '', type: String },
+    colourTime: { default: 0, type: Number }, // in percent of life
+    endPointAttractMagnitude: { default: 1, type: Number },
+    enableDriftMode: { default: false, type: Boolean },
+    driftMaxMagnitude: { default: 0.1, type: Number },
+    driftInterval: { default: 0.1, type: Number },
+    driftTiming: { default: 0.1, type: Number },
+    enablePathMode: { default: false, type: Boolean }, // path mode ignores start point prop, treat the first element of pathCoords as start point instead
+    pathCoords: { default () { return [[0, 0, 0]] }, type: Array }, // units: container percentage
+    pathTimings: { default () { return [0.1] }, type: Array }, //
+    nodeDelays: { default () { return [0] }, type: Array }, //
+    pathUseSeconds: { default: false, type: Boolean }, // whether path timings should use seconds rather than proportions of lifetime
+    pathBackToStart: { default: false, type: Boolean }, // whether the particle paths backwards to start position at end of path
+    enablePathConsistentSpeed: { default: false, type: Boolean }, // ignores path timings, instead ensures a consistent speed along the whole path
+    consistentSpeedPathTime: { default: 0, type: Number }, // used with enablePathConsistentSpeed, time for the particle to complete one path cycle
+    consistentSpeedNodeDelay: { default: 0, type: Number }, // used with enablePathConsistentSpeed, delay before traveling between each node
+    transitionTimingFunction: { default: 'ease-out', type: String },
+    enterExitTransitionTiming: { default: 0.5, type: Number },
+    useFixedPositioning: { default: false, type: Boolean } //
   },
   computed: {
-    cssVars() {
+    cssVars () {
       return {
-        '--start-colour' : this.startColour,
-        '--end-colour' : this.endColour,
-        '--move-time' : `${this.enablePathMode ? this.currentPathMoveTime : this.moveTimeSeconds}s`,
-        '--hang-time' : `${this.enablePathMode ? 0 : this.hangTimeSeconds}s`,
-        '--timing-function' : this.transitionTimingFunction,
-        '--background-color-time' : `${this.colourTimeSeconds}s`,
-        '--transition-time' : `${this.enterExitTransitionTiming}s`,
-        '--width' : this.widthHeight[0] + 'px',
-        '--height' : this.widthHeight[1] + 'px',
+        '--start-colour': this.startColour,
+        '--end-colour': this.endColour,
+        '--move-time': `${this.enablePathMode ? this.currentPathMoveTime : this.moveTimeSeconds}s`,
+        '--hang-time': `${this.enablePathMode ? 0 : this.hangTimeSeconds}s`,
+        '--timing-function': this.transitionTimingFunction,
+        '--background-color-time': `${this.colourTimeSeconds}s`,
+        '--transition-time': `${this.enterExitTransitionTiming}s`,
+        '--width': this.widthHeight[0] + 'px',
+        '--height': this.widthHeight[1] + 'px'
       }
     },
-    particleStyle() {
-      return {...this.cssVars,
+    particleStyle () {
+      return {
+        ...this.cssVars,
         transform: `translate3d(${this.currentPosition[0] - (this.widthHeight[0] / 2)}px,
-        ${this.currentPosition[1]  - (this.widthHeight[1] / 2)}px, ${this.currentPosition[2]}px)`};
-    },
-    hangTimeSeconds() {
-      return this.lifetime * this.hangTime;
-    },
-    moveTimeSeconds() {
-      if(!this.enableDriftMode) {
-        return this.lifetime * this.moveTime;
-      }
-      else {
-        return this.lifetime * this.driftInterval;
+        ${this.currentPosition[1] - (this.widthHeight[1] / 2)}px, ${this.currentPosition[2]}px)`
       }
     },
-    colourTimeSeconds() {
+    hangTimeSeconds () {
+      return this.lifetime * this.hangTime
+    },
+    moveTimeSeconds () {
+      if (!this.enableDriftMode) {
+        return this.lifetime * this.moveTime
+      } else {
+        return this.lifetime * this.driftInterval
+      }
+    },
+    colourTimeSeconds () {
       return this.lifetime * this.colourTime
     },
-    driftTimingSeconds() {
-      return this.lifetime * this.driftTiming;
+    driftTimingSeconds () {
+      return this.lifetime * this.driftTiming
     },
-    distanceToEndPoint() {
-      return [this.endPoint3d[0] - this.startPoint3d[0], this.endPoint3d[1] - this.startPoint3d[1], this.endPoint3d[2] - this.startPoint3d[2]];
+    distanceToEndPoint () {
+      return [this.endPoint3d[0] - this.startPoint3d[0], this.endPoint3d[1] - this.startPoint3d[1], this.endPoint3d[2] - this.startPoint3d[2]]
     },
-    pathConsistentTimeFullDuration() {
-      return this.consistentSpeedPathTime + (this.consistentSpeedNodeDelay * this.pathCoords.length);
+    pathConsistentTimeFullDuration () {
+      return this.consistentSpeedPathTime + (this.consistentSpeedNodeDelay * this.pathCoords.length)
     },
-    pathLength() {
-      return this.pathDistance(this.pathCoords) * this.scaleMultiplier;
+    pathLength () {
+      return this.pathDistance(this.pathCoords) * this.scaleMultiplier
     },
-    scaleMultiplier() {
-      return Math.max(this.parentDimensions[0], this.parentDimensions[1]) / 100;
+    scaleMultiplier () {
+      return Math.max(this.parentDimensions[0], this.parentDimensions[1]) / 100
     },
-    pathTimingsConsistent() {
-      return this.getTimePerPathSegmentScaled(this.absolutePathCoords, this.pathLength, this.consistentSpeedPathTime);
+    pathTimingsConsistent () {
+      return this.getTimePerPathSegmentScaled(this.absolutePathCoords, this.pathLength, this.consistentSpeedPathTime)
     },
-    pathStartCoord() {
-      let coord = this.pathCoords[0].slice(0);
-      coord[0] = (coord[0] / 100) * this.parentDimensions[0];
-      coord[1] = (coord[1] / 100) * this.parentDimensions[1];
-      coord[2] = (coord[2] / 100) * this.parentDimensions[2];
-      return coord;
+    pathStartCoord () {
+      const coord = this.pathCoords[0].slice(0)
+      coord[0] = (coord[0] / 100) * this.parentDimensions[0]
+      coord[1] = (coord[1] / 100) * this.parentDimensions[1]
+      coord[2] = (coord[2] / 100) * this.parentDimensions[2]
+      return coord
     },
-    absolutePathCoords() {
-      let coords = [];
+    absolutePathCoords () {
+      const coords = []
 
-      for(let i = 0; i < this.pathCoords.length; i++) {
+      for (let i = 0; i < this.pathCoords.length; i++) {
         coords.push([(this.pathCoords[i][0] / 100) * this.parentDimensions[0],
           (this.pathCoords[i][1] / 100) * this.parentDimensions[1],
           (this.pathCoords[i][2] / 100) * this.parentDimensions[2]])
       }
 
-      return coords;
+      return coords
     }
   },
   methods: {
-    randomNegativePositive(val) {
-      return val * (Math.floor(Math.random()*2) === 1 ? 1 : -1);
+    randomNegativePositive (val) {
+      return val * (Math.floor(Math.random() * 2) === 1 ? 1 : -1)
     },
-    randomBetweenValues(min, max) {
-      return Math.random() * (max - min) + min;
+    randomBetweenValues (min, max) {
+      return Math.random() * (max - min) + min
     },
-    randomNegativePositiveRange(range) {
-      return this.randomNegativePositive(Math.random() * range);
+    randomNegativePositiveRange (range) {
+      return this.randomNegativePositive(Math.random() * range)
     },
-    driftMove() {
-      this.currentPosition.splice(0, 1, this.currentPosition[0] + (this.randomNegativePositiveRange(this.driftMaxMagnitude)));
-      this.currentPosition.splice(1, 1, this.currentPosition[1] + (this.randomNegativePositiveRange(this.driftMaxMagnitude)));
-      this.currentPosition.splice(2, 1, this.currentPosition[2] + (this.randomNegativePositiveRange(this.driftMaxMagnitude)));
+    driftMove () {
+      this.currentPosition.splice(0, 1, this.currentPosition[0] + (this.randomNegativePositiveRange(this.driftMaxMagnitude)))
+      this.currentPosition.splice(1, 1, this.currentPosition[1] + (this.randomNegativePositiveRange(this.driftMaxMagnitude)))
+      this.currentPosition.splice(2, 1, this.currentPosition[2] + (this.randomNegativePositiveRange(this.driftMaxMagnitude)))
     },
-    getCoordTiming(index, reverse=false) {
-      let timings = this.enablePathConsistentSpeed ? this.pathTimingsConsistent : this.pathTimings;
-      let newIndex = index + (reverse ? 0 : -1);
+    getCoordTiming (index, reverse = false) {
+      const timings = this.enablePathConsistentSpeed ? this.pathTimingsConsistent : this.pathTimings
+      const newIndex = index + (reverse ? 0 : -1)
 
-      return timings[newIndex];
+      return timings[newIndex]
     },
-    pathMove(pathIndex, reverse=false) {
-
+    pathMove (pathIndex, reverse = false) {
       setTimeout(() => {
+        this.currentPathMoveTime = this.getCoordTiming(pathIndex, reverse)
 
-        this.currentPathMoveTime = this.getCoordTiming(pathIndex, reverse);
-
-        this.currentPosition.splice(0, 1, this.parentDimensions[0] * (this.pathCoords[pathIndex][0] / 100));
-        this.currentPosition.splice(1, 1, this.parentDimensions[1] * (this.pathCoords[pathIndex][1] / 100));
-        this.currentPosition.splice(2, 1, this.parentDimensions[2] * (this.pathCoords[pathIndex][2] / 100));
+        this.currentPosition.splice(0, 1, this.parentDimensions[0] * (this.pathCoords[pathIndex][0] / 100))
+        this.currentPosition.splice(1, 1, this.parentDimensions[1] * (this.pathCoords[pathIndex][1] / 100))
+        this.currentPosition.splice(2, 1, this.parentDimensions[2] * (this.pathCoords[pathIndex][2] / 100))
 
         setTimeout(() => {
-
           if (pathIndex < this.pathCoords.length - 1 && !reverse) {
             this.pathMove(pathIndex + 1)
           } else if (this.pathBackToStart && pathIndex > 0) {
             this.pathMove(pathIndex - 1, true)
           } else {
-            this.show = false;
+            this.show = false
           }
-        }, (this.getCoordTiming(pathIndex, reverse)) * (this.pathUseSeconds ? 1 : this.consistentSpeedPathTime ? 1 : this.lifetime) * 1000);
-      }, this.nodeDelays[pathIndex] ? (this.pathUseSeconds ? 1 : this.lifetime) * 1000 : 0);
+        }, (this.getCoordTiming(pathIndex, reverse)) * (this.pathUseSeconds ? 1 : this.consistentSpeedPathTime ? 1 : this.lifetime) * 1000)
+      }, this.nodeDelays[pathIndex] ? (this.pathUseSeconds ? 1 : this.lifetime) * 1000 : 0)
     },
-    resetToPathStart() {
-      this.currentPathMoveTime = 0;
+    resetToPathStart () {
+      this.currentPathMoveTime = 0
 
-      this.$set(this.currentPosition, 0, this.pathStartCoord[0]);
-      this.$set(this.currentPosition, 1, this.pathStartCoord[1]);
-      this.$set(this.currentPosition, 2, this.pathStartCoord[2]);
+      this.$set(this.currentPosition, 0, this.pathStartCoord[0])
+      this.$set(this.currentPosition, 1, this.pathStartCoord[1])
+      this.$set(this.currentPosition, 2, this.pathStartCoord[2])
     }
   },
-  mounted() {
+  mounted () {
     setTimeout(() => {
-      if(this.enableDriftMode) {
-        this.driftMove();
-        this.driftIntervalHandle = setInterval(this.driftMove, this.driftInterval * this.lifetime * 1000);
-      }
-      else if(this.enablePathMode) {
-        this.resetToPathStart();
-        setTimeout(() => {this.pathMove(1);}, this.hangTime * 1000);
-      }
-      else {
-        this.currentPosition.splice(0, 1, this.currentPosition[0] + (this.distanceToEndPoint[0] * this.endPointAttractMagnitude));
-        this.currentPosition.splice(1, 1, this.currentPosition[1] + (this.distanceToEndPoint[1] * this.endPointAttractMagnitude));
-        this.currentPosition.splice(2, 1, this.currentPosition[2] + (this.distanceToEndPoint[2] * this.endPointAttractMagnitude));
+      if (this.enableDriftMode) {
+        this.driftMove()
+        this.driftIntervalHandle = setInterval(this.driftMove, this.driftInterval * this.lifetime * 1000)
+      } else if (this.enablePathMode) {
+        this.resetToPathStart()
+        setTimeout(() => { this.pathMove(1) }, this.hangTime * 1000)
+      } else {
+        this.currentPosition.splice(0, 1, this.currentPosition[0] + (this.distanceToEndPoint[0] * this.endPointAttractMagnitude))
+        this.currentPosition.splice(1, 1, this.currentPosition[1] + (this.distanceToEndPoint[1] * this.endPointAttractMagnitude))
+        this.currentPosition.splice(2, 1, this.currentPosition[2] + (this.distanceToEndPoint[2] * this.endPointAttractMagnitude))
       }
 
-      if(this.endColour !== "") {
-        this.colourChange = true;
+      if (this.endColour !== '') {
+        this.colourChange = true
       }
-    }, 10);
+    }, 10)
 
-    if(this.lifetime >= 0) {
+    if (this.lifetime >= 0) {
       setTimeout(() => {
-        this.$emit("lifeend", this.id);
+        this.$emit('lifeend', this.id)
       }, this.lifetime * 1000)
     }
   },
-  beforeDestroy() {
-    if(this.driftIntervalHandle) {
-      clearInterval(this.driftIntervalHandle);
+  beforeDestroy () {
+    if (this.driftIntervalHandle) {
+      clearInterval(this.driftIntervalHandle)
     }
-  },
+  }
 }
 </script>
 

@@ -20,43 +20,41 @@
 </div>
 </template>
 
-<script>
-export default {
-name: "LineButton",
+<script lang="ts">
+import Vue from 'vue'
+
+export default Vue.extend({
+  name: 'LineButton',
   props: {
-    content: {default: 'default', type:String},
-    enableEnterAnimation: {default: true, type:Boolean},
+    content: {default: 'default', type: String},
+    enableEnterAnimation: {default: true, type: Boolean},
     showLeftLine: {default: false, type: Boolean}, //
     showRightLine: {default: false, type: Boolean}, //
     showBottomLine: {default: false, type: Boolean}, //
-    showTopLine: {default: false, type: Boolean}, //
+    showTopLine: {default: false, type: Boolean} //
   },
   data() {
     return {
       cornerAnimationEnded: false,
-      isMounted: false,
+      isMounted: false
     }
   },
   methods: {
-    getHeight() {
-      return this.$refs.parent.clientHeight;
-    },
-    getWidth() {
-      return this.$refs.parent.clientWidth;
-    }
   },
   computed: {
     cornerClasses() {
-      return {'corner-finished' : this.cornerAnimationEnded,
-        'disable-animation' : !this.enableEnterAnimation && !this.cornerAnimationEnded,
-        'corner-move' : this.isMounted};
+      return {
+        'corner-finished': this.cornerAnimationEnded,
+        'disable-animation': !this.enableEnterAnimation && !this.cornerAnimationEnded,
+        'corner-move': this.isMounted
+      }
     }
   },
   mounted() {
-    setTimeout(() => {this.cornerAnimationEnded = true}, 910);
-    setTimeout(() => {this.isMounted = true;}, 50);
+    setTimeout(() => { this.cornerAnimationEnded = true }, 910)
+    setTimeout(() => { this.isMounted = true }, 50)
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

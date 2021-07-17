@@ -13,278 +13,274 @@
 
 <script>
 
-import uniqueIdMixin from "@/mixins/uniqueId";
+import uniqueIdMixin from '@/mixins/uniqueId'
 
 export default {
-name: "Blob",
+  name: 'Blob',
   mixins: [
     uniqueIdMixin
   ],
   props: {
-    aspectRatio: {default() {return [0.9, 0.9]}, type:Array,
-      validator(value) {return !(value[0] > 1 || value[0] < 0 || value[1] > 1 || value[1] < 0); }},
-    centerRatio: {default() {return [0.5, 0.5]}, type:Array},
-    loopDuration: {default: 2, type: Number},
-    vertexCount: {default: 10, type:Number, validator(value) { return value > 2 }},
-    svgStyleUser: {default() {return {}}, type:Object},
-    pathStyleUser: {default() {return {}}, type:Object},
-    wiggleMagnitude: {default: 1, type:Number},
-    propertyUpdateTime: {default: 0.3, type:Number},
-    spinRate: {default: 0.15, type:Number},
-    spinDirection: {default: 0, type:Number}, //1 == clockwise | -1 == anti-clockwise | 0 == random each animation loop
-    frozen: {default: false, type:Boolean},
-    testMode: {default: false, type:Boolean},
-    name: {default: "", type:String},
-    shortText: {default: '', type:String},
-    vertexVariance: {default: 0, type:Number}, //percentage of step size | capped at > 0.3
-    enableDetectClickOutside: {default: false, type:Boolean},
-    randomiseStartPoint: {default: false, type:Boolean},
-    startPointRandomisePercentage: {default: 1, type:Number, validator(value) { return value <= 1 && value >= 0 }},
-    vertexSharpnessModifier: {default: 1, type:Number}
+    aspectRatio: {
+      default () { return [0.9, 0.9] },
+      type: Array,
+      validator (value) { return !(value[0] > 1 || value[0] < 0 || value[1] > 1 || value[1] < 0) }
+    },
+    centerRatio: { default () { return [0.5, 0.5] }, type: Array },
+    loopDuration: { default: 2, type: Number },
+    vertexCount: { default: 10, type: Number, validator (value) { return value > 2 } },
+    svgStyleUser: { default () { return {} }, type: Object },
+    pathStyleUser: { default () { return {} }, type: Object },
+    wiggleMagnitude: { default: 1, type: Number },
+    propertyUpdateTime: { default: 0.3, type: Number },
+    spinRate: { default: 0.15, type: Number },
+    spinDirection: { default: 0, type: Number }, // 1 == clockwise | -1 == anti-clockwise | 0 == random each animation loop
+    frozen: { default: false, type: Boolean },
+    testMode: { default: false, type: Boolean },
+    name: { default: '', type: String },
+    shortText: { default: '', type: String },
+    vertexVariance: { default: 0, type: Number }, // percentage of step size | capped at > 0.3
+    enableDetectClickOutside: { default: false, type: Boolean },
+    randomiseStartPoint: { default: false, type: Boolean },
+    startPointRandomisePercentage: { default: 1, type: Number, validator (value) { return value <= 1 && value >= 0 } },
+    vertexSharpnessModifier: { default: 1, type: Number }
   },
-  data() {
+  data () {
     return {
       curveStrengthFactor: 4.5 * this.vertexSharpnessModifier,
-      currentPathSVG: "",
-      pathToMoveToSVG: "",
-      startPathSVG: "",
+      currentPathSVG: '',
+      pathToMoveToSVG: '',
+      startPathSVG: '',
       viewSize: 1000,
       xRadius: (this.viewSize / 2) * this.aspectRatio[0],
       yRadius: (this.viewSize / 2) * this.aspectRatio[1],
       centerX: this.viewSize * this.centerRatio[0],
       centerY: this.viewSize * this.centerRatio[1],
       coords: [],
-      durationChange: {changed:false, to: 0, from: 0},
+      durationChange: { changed: false, to: 0, from: 0 },
       propertyChanged: true,
       joinOffset: this.randomiseStartPoint ? this.randomNegativePositiveRange(0, 2 * Math.PI * this.startPointRandomisePercentage) : 1,
-      staticPath: ""
+      staticPath: ''
     }
   },
   computed: {
-    generatedId() {
-      return "blob" + this.getUniqueId();
+    generatedId () {
+      return 'blob' + this.getUniqueId()
     },
-    animationID() {
-      return "toAnimation" + this.getUniqueId();
+    animationID () {
+      return 'toAnimation' + this.getUniqueId()
     },
-    defaultStyle() {
-      return {fill: "hsl(0,0,0)", stroke: "hsl(0,0,0)", strokeWidth: 0};
+    defaultStyle () {
+      return { fill: 'hsl(0,0,0)', stroke: 'hsl(0,0,0)', strokeWidth: 0 }
     },
-    svgSize() {
-      let defaultSize = 1000;
+    svgSize () {
+      const defaultSize = 1000
       return `${((1 - this.aspectRatio[0] - 0.1) / 2) * defaultSize} ` +
               `${((1 - this.aspectRatio[1] - 0.1) / 2) * defaultSize} ` +
               `${(this.aspectRatio[0] + 0.1) * defaultSize} ` +
-              `${(this.aspectRatio[1] + 0.1) * defaultSize}`;
+              `${(this.aspectRatio[1] + 0.1) * defaultSize}`
     },
-    pathStyle() {
-      let style = {};
-      return Object.assign(style, this.defaultStyle, this.pathStyleUser);
+    pathStyle () {
+      const style = {}
+      return Object.assign(style, this.defaultStyle, this.pathStyleUser)
     },
-    svgStyle() {
-      let style = {};
-      return Object.assign(style, this.defaultStyle, this.svgStyleUser);
+    svgStyle () {
+      const style = {}
+      return Object.assign(style, this.defaultStyle, this.svgStyleUser)
     },
-    vertexFactor() {
-      return (2*Math.PI) / this.vertexCount;
+    vertexFactor () {
+      return (2 * Math.PI) / this.vertexCount
     },
-    durationRandomised() {
-      let multiplier = 1;
-      if(this.loopDuration < 0.2) {
-        multiplier = 0;
+    durationRandomised () {
+      let multiplier = 1
+      if (this.loopDuration < 0.2) {
+        multiplier = 0
       }
-      return multiplier * (0.1 * (Math.floor(Math.random()*2) === 1 ? 1 : -1));
+      return multiplier * (0.1 * (Math.floor(Math.random() * 2) === 1 ? 1 : -1))
     }
   },
   methods: {
-    clicked() {
-      this.$emit("blobClicked", this.name)
+    clicked () {
+      this.$emit('blobClicked', this.name)
     },
-    mouseEnter() {
-      this.$emit("blobMouseEnter", this.name)
+    mouseEnter () {
+      this.$emit('blobMouseEnter', this.name)
     },
-    mouseLeave() {
-      this.$emit("blobMouseLeave", this.name)
+    mouseLeave () {
+      this.$emit('blobMouseLeave', this.name)
     },
-    generateCoords() {
-      let pathArray = [];
-      let count = 0;
-      let varianceStep;
+    generateCoords () {
+      const pathArray = []
+      let count = 0
+      let varianceStep
 
-      if(this.vertexVariance > 0.3) {
-        varianceStep = 0.3 * this.vertexVariance;
+      if (this.vertexVariance > 0.3) {
+        varianceStep = 0.3 * this.vertexVariance
       } else {
-        varianceStep = this.vertexFactor * this.vertexVariance;
+        varianceStep = this.vertexFactor * this.vertexVariance
       }
 
-      let averageRadius = (this.xRadius + this.yRadius) / 2;
-      //moves round circular path, placing points at vertexFactor deg interval
-      for (let i = this.joinOffset; i < 2*Math.PI + this.joinOffset; i += this.vertexFactor) {
+      const averageRadius = (this.xRadius + this.yRadius) / 2
+      // moves round circular path, placing points at vertexFactor deg interval
+      for (let i = this.joinOffset; i < 2 * Math.PI + this.joinOffset; i += this.vertexFactor) {
+        const tempVarStep = this.randomNegativePositiveRange(varianceStep)
 
-        let tempVarStep = this.randomNegativePositiveRange(varianceStep);
-
-        let x = ((this.xRadius + this.getRandomRadiusModifier(averageRadius)) * Math.cos(i + tempVarStep) + this.centerX);
-        let y = ((this.yRadius + this.getRandomRadiusModifier(averageRadius)) * Math.sin(i + tempVarStep) + this.centerY);
-        pathArray.push({x,y});
-        if(count === this.vertexCount-1) {
-          break;
+        const x = ((this.xRadius + this.getRandomRadiusModifier(averageRadius)) * Math.cos(i + tempVarStep) + this.centerX)
+        const y = ((this.yRadius + this.getRandomRadiusModifier(averageRadius)) * Math.sin(i + tempVarStep) + this.centerY)
+        pathArray.push({ x, y })
+        if (count === this.vertexCount - 1) {
+          break
         }
-        count++;
+        count++
       }
-      return pathArray;
+      return pathArray
     },
-    getSpin() {
-      if(this.spinDirection === 0) {
-        return this.randomNegativePositive(this.spinRate);
-      }
-      else if(this.spinDirection > 0) {
-        return this.spinRate;
-      }
-      else if(this.spinDirection < 0) {
-        return -this.spinRate;
+    getSpin () {
+      if (this.spinDirection === 0) {
+        return this.randomNegativePositive(this.spinRate)
+      } else if (this.spinDirection > 0) {
+        return this.spinRate
+      } else if (this.spinDirection < 0) {
+        return -this.spinRate
       }
     },
-    randomNegativePositive(val) {
-      return val * (Math.floor(Math.random()*2) === 1 ? 1 : -1);
+    randomNegativePositive (val) {
+      return val * (Math.floor(Math.random() * 2) === 1 ? 1 : -1)
     },
-    randomNegativePositiveRange(range) {
-      return this.randomNegativePositive(Math.random() * range);
+    randomNegativePositiveRange (range) {
+      return this.randomNegativePositive(Math.random() * range)
     },
-    getRandomRadiusModifier(radius) {
-      let num = Math.floor(Math.random() * (radius / 15)) + 1;
-      num *= this.wiggleMagnitude;
-      return this.randomNegativePositive(num);
+    getRandomRadiusModifier (radius) {
+      let num = Math.floor(Math.random() * (radius / 15)) + 1
+      num *= this.wiggleMagnitude
+      return this.randomNegativePositive(num)
     },
-    generateSvgPath(coordArray) {
-      let d = "";
+    generateSvgPath (coordArray) {
+      let d = ''
       coordArray.forEach((coord, index, array) => {
-        let p = [];
+        const p = []
         if (index === 0) {
-          d += `M${coord.x},${coord.y} `;
-          p.push(array[array.length - 1]);
-          p.push(array[index]);
-          p.push(array[index+1]);
-          p.push(array[index+2]);
+          d += `M${coord.x},${coord.y} `
+          p.push(array[array.length - 1])
+          p.push(array[index])
+          p.push(array[index + 1])
+          p.push(array[index + 2])
         } else if (index === array.length - 2) {
-          p.push(array[index-1]);
-          p.push(array[index]);
-          p.push(array[index+1]);
-          p.push(array[0]);
+          p.push(array[index - 1])
+          p.push(array[index])
+          p.push(array[index + 1])
+          p.push(array[0])
         } else if (index === array.length - 1) {
-          p.push(array[index-1]);
-          p.push(array[index]);
-          p.push(array[0]);
-          p.push(array[1]);
+          p.push(array[index - 1])
+          p.push(array[index])
+          p.push(array[0])
+          p.push(array[1])
         } else {
-          p.push(array[index-1]);
-          p.push(array[index]);
-          p.push(array[index+1]);
-          p.push(array[index+2]);
+          p.push(array[index - 1])
+          p.push(array[index])
+          p.push(array[index + 1])
+          p.push(array[index + 2])
         }
-        let bp = [];
-        bp.push( { x: p[1].x,  y: p[1].y } );
-        bp.push( { x: ((-p[0].x + this.curveStrengthFactor*p[1].x + p[2].x) / this.curveStrengthFactor), y: ((-p[0].y + this.curveStrengthFactor*p[1].y + p[2].y) / this.curveStrengthFactor)} );
-        bp.push( { x: ((p[1].x + this.curveStrengthFactor*p[2].x - p[3].x) / this.curveStrengthFactor),  y: ((p[1].y + this.curveStrengthFactor*p[2].y - p[3].y) / this.curveStrengthFactor) } );
-        bp.push( { x: p[2].x,  y: p[2].y } );
-        d += "C" + bp[1].x + "," + bp[1].y + " " + bp[2].x + "," + bp[2].y + " " + bp[3].x + "," + bp[3].y + " ";
-
+        const bp = []
+        bp.push({ x: p[1].x, y: p[1].y })
+        bp.push({ x: ((-p[0].x + this.curveStrengthFactor * p[1].x + p[2].x) / this.curveStrengthFactor), y: ((-p[0].y + this.curveStrengthFactor * p[1].y + p[2].y) / this.curveStrengthFactor) })
+        bp.push({ x: ((p[1].x + this.curveStrengthFactor * p[2].x - p[3].x) / this.curveStrengthFactor), y: ((p[1].y + this.curveStrengthFactor * p[2].y - p[3].y) / this.curveStrengthFactor) })
+        bp.push({ x: p[2].x, y: p[2].y })
+        d += 'C' + bp[1].x + ',' + bp[1].y + ' ' + bp[2].x + ',' + bp[2].y + ' ' + bp[3].x + ',' + bp[3].y + ' '
       })
 
-      return d;
+      return d
     },
-    updateShapeValues() {
+    updateShapeValues () {
       this.xRadius = (this.viewSize / 2) * this.aspectRatio[0]
       this.yRadius = (this.viewSize / 2) * this.aspectRatio[1]
       this.centerX = this.viewSize * this.centerRatio[0]
       this.centerY = this.viewSize * this.centerRatio[1]
     },
-    initialise() {
-      this.updateShapeValues();
+    initialise () {
+      this.updateShapeValues()
 
-      this.currentPathSVG = this.generateSvgPath(this.generateCoords());
-      this.joinOffset += this.getSpin();
-      this.pathToMoveToSVG = this.generateSvgPath(this.generateCoords());
+      this.currentPathSVG = this.generateSvgPath(this.generateCoords())
+      this.joinOffset += this.getSpin()
+      this.pathToMoveToSVG = this.generateSvgPath(this.generateCoords())
 
-      this.$refs.parentSVG.setCurrentTime(0);
+      this.$refs.parentSVG.setCurrentTime(0)
 
-      if(!this.frozen) {
-        this.startAnimate();
+      if (!this.frozen) {
+        this.startAnimate()
       }
     },
-    blobAnimate() {
-      this.currentPathSVG = this.pathToMoveToSVG;
-      this.$refs.parentSVG.setCurrentTime(0);
-      this.joinOffset += this.getSpin();
-      let coords = this.generateCoords();
-      this.pathToMoveToSVG = this.generateSvgPath(coords);
+    blobAnimate () {
+      this.currentPathSVG = this.pathToMoveToSVG
+      this.$refs.parentSVG.setCurrentTime(0)
+      this.joinOffset += this.getSpin()
+      const coords = this.generateCoords()
+      this.pathToMoveToSVG = this.generateSvgPath(coords)
 
-      if(this.testMode) {
-        this.coords = coords;
+      if (this.testMode) {
+        this.coords = coords
       }
 
-      this.$refs.toAnimation.beginElement();
+      this.$refs.toAnimation.beginElement()
     },
-    startAnimate() {
-      this.$refs.toAnimation.addEventListener('endEvent', this.blobAnimate);
+    startAnimate () {
+      this.$refs.toAnimation.addEventListener('endEvent', this.blobAnimate)
     },
-    endAnimate() {
-      this.$refs.toAnimation.removeEventListener('endEvent', this.blobAnimate);
+    endAnimate () {
+      this.$refs.toAnimation.removeEventListener('endEvent', this.blobAnimate)
     },
-    clickedOutside(event) {
+    clickedOutside (event) {
       if (this.$refs.blobPath === event.target) {
-        return;
+        return
       }
-      this.$emit('clickedOutside', event);
+      this.$emit('clickedOutside', event)
     }
   },
-  updated() {
-    if(this.durationChange.changed) {
-      this.$refs.parentSVG.setCurrentTime(this.$refs.parentSVG.getCurrentTime() * this.durationChange.to / this.durationChange.from);
-      this.durationChange.changed= false;
+  updated () {
+    if (this.durationChange.changed) {
+      this.$refs.parentSVG.setCurrentTime(this.$refs.parentSVG.getCurrentTime() * this.durationChange.to / this.durationChange.from)
+      this.durationChange.changed = false
     }
   },
-  mounted() {
-
-    if(this.enableDetectClickOutside) {
-      document.addEventListener("click", this.clickedOutside);
+  mounted () {
+    if (this.enableDetectClickOutside) {
+      document.addEventListener('click', this.clickedOutside)
     }
 
-    this.initialise();
+    this.initialise()
 
-    if(this.frozen) {
-      let coords = this.generateCoords();
+    if (this.frozen) {
+      const coords = this.generateCoords()
 
-      if(this.testMode) {
-        this.coords = coords;
+      if (this.testMode) {
+        this.coords = coords
       }
-      this.staticPath = this.generateSvgPath(coords);
+      this.staticPath = this.generateSvgPath(coords)
     }
   },
-  beforeDestroy() {
-    document.removeEventListener("click", this.clickedOutside);
+  beforeDestroy () {
+    document.removeEventListener('click', this.clickedOutside)
   },
   watch: {
-    loopDuration(from, to) {
-      this.durationChange.changed = true;
-      this.durationChange.from = from + this.durationRandomised;
-      this.durationChange.to = to + this.durationRandomised;
+    loopDuration (from, to) {
+      this.durationChange.changed = true
+      this.durationChange.from = from + this.durationRandomised
+      this.durationChange.to = to + this.durationRandomised
     },
-    aspectRatio() {
-      this.updateShapeValues();
-      this.propertyChanged = true;
-
+    aspectRatio () {
+      this.updateShapeValues()
+      this.propertyChanged = true
     },
-    centerRatio() {
-      this.updateShapeValues();
-      this.propertyChanged = true;
+    centerRatio () {
+      this.updateShapeValues()
+      this.propertyChanged = true
     },
-    frozen(from, to) {
-      if(to) {
-        this.staticPath = this.generateSvgPath(this.generateCoords());
-        this.endAnimate();
-      }
-      else {
-        this.staticPath = "";
+    frozen (from, to) {
+      if (to) {
+        this.staticPath = this.generateSvgPath(this.generateCoords())
+        this.endAnimate()
+      } else {
+        this.staticPath = ''
         this.initialise()
       }
     }

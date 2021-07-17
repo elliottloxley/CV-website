@@ -15,10 +15,10 @@
 
 <script>
 export default {
-name: "SlottedDiv",
+  name: 'SlottedDiv',
   props: {
-    disablePointerForeground: {default: false, type:Boolean},
-    disablePointerBackground: {default: false, type:Boolean}
+    disablePointerForeground: { default: false, type: Boolean },
+    disablePointerBackground: { default: false, type: Boolean }
   }
 }
 </script>

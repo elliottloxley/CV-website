@@ -7,10 +7,10 @@
 </template>
 
 <script>
-import GridViewItem from "@/components/old work/GridViewItem";
+import GridViewItem from '@/components/old work/GridViewItem'
 
 export default {
-  name: "GridView",
+  name: 'GridView',
   props: {
     dataUrl: {
       type: String,
@@ -18,18 +18,18 @@ export default {
     },
     itemMaxWidth: String
   },
-  components: {GridViewItem},
+  components: { GridViewItem },
   data: function () {
     return {
       gridItems: [],
       animationDelay: 0,
       animationDelayIncrement: 150,
       descriptionShownId: null
-    };
+    }
   },
   methods: {
-    populate() {
-      //TODO replace with real code when deploy, this is for testing
+    populate () {
+      // TODO replace with real code when deploy, this is for testing
       // this.axios.post(this.dataUrl, "").then((response) => {
       //   const dataCpy = response.data;
       //   let delayCpy = this.animationDelay;
@@ -42,43 +42,43 @@ export default {
       //   console.log(error);
       // });
 
-
-      const dataCpy = this.dummyData();
-        let delayCpy = this.animationDelay;
-        const delayIncCpy = this.animationDelayIncrement;
-        let inc = 1;
-        for(const item in dataCpy) {
-          dataCpy[item]["id"] = inc;
-          setTimeout(()=> {this.gridItems.push(dataCpy[item])}, delayCpy);
-          delayCpy += delayIncCpy;
-          inc+=1;
-       }
-    },
-    dummyData() {
-      //TODO delete when deployed, replace with real data
-      return Array.from({ length: 20 }, () => ({"id" : 1,
-          "name" : "alexsite",
-          "title" : "Alexander music site",
-          "short_desc" : "site for my brother alexander",
-          "long_desc" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis nec hendrerit diam, ut finibus enim. Mauris vitae arcu eget eros dictum faucibus vel nec velit. Vestibulum placerat justo ultricies risus dictum, eget ultrices odio lobortis. Aliquam velit lorem, tempus vitae condimentum vel, ornare ac sapien. Nullam mollis dignissim velit sit amet vehicula. Curabitur non magna consectetur, faucibus quam quis, vestibulum mi. Sed a fermentum sem, non gravida lacus. Praesent iaculis lobortis magna a ultrices. Etiam sed sagittis ligula. Nullam placerat dapibus consequat. Nam non blandit neque. Proin mi nibh, rhoncus nec gravida sit amet, rhoncus at tellus.",
-          "img" : "temp.jpg",
-          "link" : "sites/alexsite"}))
-    },
-    handleDescriptionSelected(id) {
-      if(this.descriptionShownId !== id) {
-        this.descriptionShownId = id;
+      const dataCpy = this.dummyData()
+      let delayCpy = this.animationDelay
+      const delayIncCpy = this.animationDelayIncrement
+      let inc = 1
+      for (const item in dataCpy) {
+        dataCpy[item].id = inc
+        setTimeout(() => { this.gridItems.push(dataCpy[item]) }, delayCpy)
+        delayCpy += delayIncCpy
+        inc += 1
       }
-      else {
-        this.descriptionShownId = null;
+    },
+    dummyData () {
+      // TODO delete when deployed, replace with real data
+      return Array.from({ length: 20 }, () => ({
+        id: 1,
+        name: 'alexsite',
+        title: 'Alexander music site',
+        short_desc: 'site for my brother alexander',
+        long_desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis nec hendrerit diam, ut finibus enim. Mauris vitae arcu eget eros dictum faucibus vel nec velit. Vestibulum placerat justo ultricies risus dictum, eget ultrices odio lobortis. Aliquam velit lorem, tempus vitae condimentum vel, ornare ac sapien. Nullam mollis dignissim velit sit amet vehicula. Curabitur non magna consectetur, faucibus quam quis, vestibulum mi. Sed a fermentum sem, non gravida lacus. Praesent iaculis lobortis magna a ultrices. Etiam sed sagittis ligula. Nullam placerat dapibus consequat. Nam non blandit neque. Proin mi nibh, rhoncus nec gravida sit amet, rhoncus at tellus.',
+        img: 'temp.jpg',
+        link: 'sites/alexsite'
+      }))
+    },
+    handleDescriptionSelected (id) {
+      if (this.descriptionShownId !== id) {
+        this.descriptionShownId = id
+      } else {
+        this.descriptionShownId = null
       }
     }
   },
-  mounted() {
-      this.populate();
+  mounted () {
+    this.populate()
   },
   watch: {
-    $route(){
-      this.gridItems = {};
+    $route () {
+      this.gridItems = {}
     }
   }
 }

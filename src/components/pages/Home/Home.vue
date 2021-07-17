@@ -114,43 +114,42 @@ import 'vue-md-icons/src/icons/work'
 import 'vue-md-icons/src/icons/person'
 import 'vue-md-icons/src/icons/call'
 import 'vue-md-icons/src/icons/clear'
-import LinePath from "@/components/All Pages/LinePath";
-import LineButtonWithPaths from "@/components/All Pages/LineButtonWithPaths";
-import TextWithConnector from "@/components/All Pages/TextWithConnector";
-
+import LinePath from '@/components/All Pages/LinePath'
+import LineButtonWithPaths from '@/components/All Pages/LineButtonWithPaths'
+import TextWithConnector from '@/components/All Pages/TextWithConnector'
 
 export default {
-  name: "Home",
+  name: 'Home',
   components: {
     TextWithConnector,
     LineButtonWithPaths,
-    LinePath,
+    LinePath
   },
-  data() {
+  data () {
     return {
       particles: {},
       lineParentDimensions: [],
       displayLine: false,
       mousePosition: [],
-      contentDisplay: {6: false, 7: false, 8: false},
+      contentDisplay: { 6: false, 7: false, 8: false },
       mainLineSlots: ['nodeSlot2', 'nodeSlot3']
     }
   },
   computed: {
   },
   methods: {
-    deleteParticle(id) {
-      this.$delete(this.particles, id);
+    deleteParticle (id) {
+      this.$delete(this.particles, id)
     },
-    hitNode(index) {
-      if(index in this.contentDisplay) {
-        this.contentDisplay[index] = true;
+    hitNode (index) {
+      if (index in this.contentDisplay) {
+        this.contentDisplay[index] = true
       }
     },
-    navClicked(path) {
-      setTimeout(() => {this.$router.push(path)}, 200);
-    },
-/*    mouseMove(event) {
+    navClicked (path) {
+      setTimeout(() => { this.$router.push(path) }, 200)
+    }
+    /*    mouseMove(event) {
       //this.mousePosition = [event.clientX, event.clientY];
 
       let width = this.$refs.lineBackground.clientWidth;
@@ -160,13 +159,13 @@ export default {
       let yPercent = (event.clientY / height) - 0.5;
 
       this.cloudPerspective = `${50 + (xPercent * 5)}% ${50 + (yPercent * 5)}%`
-    }*/
+    } */
   },
-  mounted() {
+  mounted () {
     this.$nextTick(() => {
-      this.$set(this.particles, 1, 0);
-      this.displayLine = true;
-    });
+      this.$set(this.particles, 1, 0)
+      this.displayLine = true
+    })
   }
 }
 </script>

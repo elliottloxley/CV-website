@@ -20,20 +20,20 @@
 </template>
 
 <script>
-import SlottedDiv from "@/components/old work/SlottedDiv";
-import Blob from "@/components/old work/Blob";
+import SlottedDiv from '@/components/old work/SlottedDiv'
+import Blob from '@/components/old work/Blob'
 export default {
-  name: "SimpleBlobLink",
-  components: {Blob, SlottedDiv},
+  name: 'SimpleBlobLink',
+  components: { Blob, SlottedDiv },
   props: {
-    navLink: {required: true, type:String},
-    content: {default: "default", type:String},
-    blobColour: {default: "white", type:String},
-    textColour: {default: "black", type:String}
+    navLink: { required: true, type: String },
+    content: { default: 'default', type: String },
+    blobColour: { default: 'white', type: String },
+    textColour: { default: 'black', type: String }
   },
   methods: {
-    onClick() {
-      this.$router.push(this.navLink);
+    onClick () {
+      this.$router.push(this.navLink)
     }
   }
 }

@@ -14,24 +14,24 @@
 
 <script>
 export default {
-  name: "HomeNavbarItem",
+  name: 'HomeNavbarItem',
   props: {
     navIconUrl: String,
     navText: String,
     navLink: String,
-    navPopup: String,
+    navPopup: String
   },
-  data() {
+  data () {
     return {
       showMenu: false
     }
   },
   methods: {
-    appear() {
-      this.showMenu = true;
+    appear () {
+      this.showMenu = true
     },
-    hide() {
-      this.showMenu = false;
+    hide () {
+      this.showMenu = false
     }
   }
 }

@@ -67,7 +67,7 @@
 
 <script>
 export default {
-name: "SvgFilters"
+  name: 'SvgFilters'
 }
 </script>
 

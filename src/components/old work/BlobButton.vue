@@ -24,54 +24,54 @@
 </template>
 
 <script>
-import Blob from "@/components/old work/Blob";
+import Blob from '@/components/old work/Blob'
 export default {
-name: "BlobButton",
-  components: {Blob},
+  name: 'BlobButton',
+  components: { Blob },
   props: {
-    useCustomIcon: {default: false, type:Boolean},
-    navIconUrl: {default: "icon.svg", type:String},
-    navText: {default: "Default", type:String},
-    name: {default: 'default', type:String},
-    fontSize: {default: 1, type:Number},
-    contentStyle: {default() {return {}}, type:Object},
-    blobStyleUser: {default() {return {}}, type: Object},
-    disableHoverGrow: {default: false, type:Boolean},
-    showText: {default: false, type:Boolean},
-    checkOutsideClick: {default: false, type:Boolean},
-    blobStatic: {default: false, type:Boolean},
-    blobVertices: {default: 8, type:Number},
-    blobMagnitude: {default: 1, type:Number}
+    useCustomIcon: { default: false, type: Boolean },
+    navIconUrl: { default: 'icon.svg', type: String },
+    navText: { default: 'Default', type: String },
+    name: { default: 'default', type: String },
+    fontSize: { default: 1, type: Number },
+    contentStyle: { default () { return {} }, type: Object },
+    blobStyleUser: { default () { return {} }, type: Object },
+    disableHoverGrow: { default: false, type: Boolean },
+    showText: { default: false, type: Boolean },
+    checkOutsideClick: { default: false, type: Boolean },
+    blobStatic: { default: false, type: Boolean },
+    blobVertices: { default: 8, type: Number },
+    blobMagnitude: { default: 1, type: Number }
   },
   computed: {
-    blobStyle() {
-      let style = {};
-      return Object.assign(style, {cursor:'pointer'}, this.blobStyleUser);
+    blobStyle () {
+      const style = {}
+      return Object.assign(style, { cursor: 'pointer' }, this.blobStyleUser)
     }
   },
-  data() {
+  data () {
     return {
       isBlobHover: false
     }
   },
   methods: {
-    onBlobMouseEnter() {
+    onBlobMouseEnter () {
       this.$emit('buttonMouseEnter', name)
       this.isBlobHover = true
     },
-    onBlobMouseLeave() {
+    onBlobMouseLeave () {
       this.$emit('buttonMouseLeave', name)
       this.isBlobHover = false
     },
-    clickedOutside(event) {
+    clickedOutside (event) {
       this.$emit('clickedOutside', event)
     }
   },
   filters: {
-    capitilise(val) {
-      if (!val) return '';
-      val = val.toString();
-      return val.toUpperCase();
+    capitilise (val) {
+      if (!val) return ''
+      val = val.toString()
+      return val.toUpperCase()
     }
   }
 }
@@ -163,7 +163,6 @@ name: "BlobButton",
 .text-leave-active {
   animation blob-text-leave 0.3s;
 }
-
 
 @keyframes blob-hover-animation {
   from {

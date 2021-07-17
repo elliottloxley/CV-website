@@ -18,14 +18,14 @@
 </template>
 
 <script>
-import HomeNavbarItem from "@/components/old work/HomeNavbarItem";
+import HomeNavbarItem from '@/components/old work/HomeNavbarItem'
 
 export default {
-  name: "HomeNavbar",
+  name: 'HomeNavbar',
   components: {
     'home-navbar-item': HomeNavbarItem
   },
-  data() {
+  data () {
     return {
       enterDelayPattern: [50, 250, 100, 350],
       leaveDelayPattern: [350, 150, 250, 50],
@@ -33,39 +33,37 @@ export default {
     }
   },
   methods: {
-    menuEnter() {
+    menuEnter () {
       for (const i in this.enterDelayPattern) {
-        setTimeout(() => {this.$refs["menu" + i].appear()}, this.enterDelayPattern[i])
-        this.show = true;
+        setTimeout(() => { this.$refs['menu' + i].appear() }, this.enterDelayPattern[i])
+        this.show = true
       }
     },
-    menuLeave() {
+    menuLeave () {
       for (const i in this.enterDelayPattern) {
-        setTimeout(() => {this.$refs["menu" + i].hide()}, this.leaveDelayPattern[i])
-        setTimeout(() => {this.show = false;}, 1000);
+        setTimeout(() => { this.$refs['menu' + i].hide() }, this.leaveDelayPattern[i])
+        setTimeout(() => { this.show = false }, 1000)
       }
     }
   },
   watch: {
-    $route(to, from) {
-      if(to.name === "home") {
+    $route (to, from) {
+      if (to.name === 'home') {
         setTimeout(() => {
           this.menuEnter()
-        }, 500);
-      }
-      else if(from.name === "home") {
-        this.menuLeave();
+        }, 500)
+      } else if (from.name === 'home') {
+        this.menuLeave()
       }
     }
   },
-  mounted() {
-    if(this.$route.name === "home") {
+  mounted () {
+    if (this.$route.name === 'home') {
       setTimeout(() => {
         this.menuEnter()
-      }, 500);
-    }
-    else {
-      this.menuLeave();
+      }, 500)
+    } else {
+      this.menuLeave()
     }
   }
 }

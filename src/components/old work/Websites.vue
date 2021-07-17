@@ -9,11 +9,11 @@
 </template>
 
 <script>
-import GridView from "@/components/old work/GridView";
+import GridView from '@/components/old work/GridView'
 
 export default {
-  name: "Websites",
-  components: {GridView}
+  name: 'Websites',
+  components: { GridView }
 }
 </script>
 

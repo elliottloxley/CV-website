@@ -23,19 +23,19 @@
 
 <script>
 
-import uniqueIdMixin from "@/mixins/uniqueId";
+import uniqueIdMixin from '@/mixins/uniqueId'
 
 export default {
-name: "MorphingIcon",
+  name: 'MorphingIcon',
   mixins: [
     uniqueIdMixin
   ],
   props: {
-    iconData: {required: true, type:Object},
-    fromOrTo: {default: true, type:Boolean},
-    fromToDuration: {default() {return [0.3, 0.3]}, type:Array}
+    iconData: { required: true, type: Object },
+    fromOrTo: { default: true, type: Boolean },
+    fromToDuration: { default () { return [0.3, 0.3] }, type: Array }
   },
-  data() {
+  data () {
     return {
       fromPaths: this.iconData.from,
       toPaths: this.iconData.to,
@@ -46,25 +46,25 @@ name: "MorphingIcon",
     }
   },
   computed: {
-    IconId() {
-      return "animatedIcon" +  this.getUniqueId();
+    IconId () {
+      return 'animatedIcon' + this.getUniqueId()
     },
-    fromEndFrame() {
-      return this.fromPaths[this.fromPaths.length - 1];
+    fromEndFrame () {
+      return this.fromPaths[this.fromPaths.length - 1]
     },
-    toEndFrame() {
-      return this.toPaths[this.toPaths.length - 1];
+    toEndFrame () {
+      return this.toPaths[this.toPaths.length - 1]
     },
-    fromPathsString() {
-      return this.toEndFrame + ';' + this.fromPaths.join(';');
+    fromPathsString () {
+      return this.toEndFrame + ';' + this.fromPaths.join(';')
     },
-    toPathsString() {
-      return this.fromEndFrame + ';' + this.toPaths.join(';');
+    toPathsString () {
+      return this.fromEndFrame + ';' + this.toPaths.join(';')
     }
   },
   watch: {
-    fromOrTo() {
-      this.$refs.parentSVG.setCurrentTime(0);
+    fromOrTo () {
+      this.$refs.parentSVG.setCurrentTime(0)
     }
   }
 }

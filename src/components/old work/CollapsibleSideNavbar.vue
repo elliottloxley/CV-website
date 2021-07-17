@@ -25,30 +25,30 @@ import Icon from 'vue-md-icons/src/components/Icon'
 import 'vue-md-icons/src/icons/arrow_drop_down'
 
 export default {
-name: "collapsible-side-navbar",
+  name: 'collapsible-side-navbar',
   components: {
     Icon
   },
   props: {
-    navObject: {required: true},
-    content: {type:String, required: true},
-    navId: {default: "", type:String},
-    isActive: {default: false, type: Boolean},
-    linkStyle: {default() {return {}}, type:Object},
-    indent: {required: true},
-    indentStyles: {default() {return []}, type:Array},
-    defaultStyle: {default() {return {}}, type:Object}
+    navObject: { required: true },
+    content: { type: String, required: true },
+    navId: { default: '', type: String },
+    isActive: { default: false, type: Boolean },
+    linkStyle: { default () { return {} }, type: Object },
+    indent: { required: true },
+    indentStyles: { default () { return [] }, type: Array },
+    defaultStyle: { default () { return {} }, type: Object }
   },
-  data() {
+  data () {
     return {
       isExpanded: true
     }
   },
   computed: {
-    contentStyle() {
-      return this.indentStyles[this.indent] === undefined || this.indentStyles[this.indent] === {} ?
-          this.defaultStyle :
-          this.indentStyles[this.indent];
+    contentStyle () {
+      return this.indentStyles[this.indent] === undefined || this.indentStyles[this.indent] === {}
+        ? this.defaultStyle
+        : this.indentStyles[this.indent]
     }
   }
 }

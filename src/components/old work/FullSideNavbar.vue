@@ -33,17 +33,17 @@
 </template>
 <script>
 
-import PageNavbar from "@/components/All Pages/PageNavbar";
+import PageNavbar from '@/components/All Pages/PageNavbar'
 import 'vue-md-icons/src/icons/settings'
-import CollapsibleSideNavbar from "@/components/old work/CollapsibleSideNavbar";
-import BlobLine from "@/components/old work/BlobLine";
+import CollapsibleSideNavbar from '@/components/old work/CollapsibleSideNavbar'
+import BlobLine from '@/components/old work/BlobLine'
 
 export default {
   name: 'FullSideNavbar',
   components: {
     BlobLine,
     CollapsibleSideNavbar,
-    PageNavbar,
+    PageNavbar
   },
   data () {
     return {
@@ -54,36 +54,36 @@ export default {
     }
   },
   props: {
-    pageContent: {default() {return {}}, type:Object}
+    pageContent: { default () { return {} }, type: Object }
   },
   watch: {
-    $route(to) {
-      this.page = to.name;
+    $route (to) {
+      this.page = to.name
     }
   },
   methods: {
-    menuClicked(val) {
-      this.navbarOpen = !val;
+    menuClicked (val) {
+      this.navbarOpen = !val
     },
-    outsideClickIncrement(event) {
-      if(!this.checkingClicks) {
-        this.checkingClicks = true;
-        setTimeout(() => {this.checkingClicks = false; this.outsideClickCount = 0;}, 50);
+    outsideClickIncrement (event) {
+      if (!this.checkingClicks) {
+        this.checkingClicks = true
+        setTimeout(() => { this.checkingClicks = false; this.outsideClickCount = 0 }, 50)
       }
-      let e = this.$refs.contentNav;
-      if(!e.$el.contains(event.target)) {
-        this.outsideClickCount += 1;
+      const e = this.$refs.contentNav
+      if (!e.$el.contains(event.target)) {
+        this.outsideClickCount += 1
       }
 
-      if(this.outsideClickCount >= 2) {
-        this.navbarOpen = false;
-        this.checkingClicks = false;
-        this.outsideClickCount = 0;
+      if (this.outsideClickCount >= 2) {
+        this.navbarOpen = false
+        this.checkingClicks = false
+        this.outsideClickCount = 0
       }
     }
   },
-  mounted() {
-    this.page = this.$route.name;
+  mounted () {
+    this.page = this.$route.name
   }
 }
 </script>

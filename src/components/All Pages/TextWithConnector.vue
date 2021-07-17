@@ -41,11 +41,11 @@
 </template>
 
 <script>
-import LinePath from "@/components/All Pages/LinePath";
+import LinePath from '@/components/All Pages/LinePath'
 export default {
-name: "TextWithConnector",
-  components: {LinePath},
-  data() {
+  name: 'TextWithConnector',
+  components: { LinePath },
+  data () {
     return {
       parentDimensions: [],
       nodeSlotNode: 'nodeSlot0',
@@ -55,51 +55,57 @@ name: "TextWithConnector",
     }
   },
   props: {
-    entryDirection: {default: 'left', type:String, validator(value) {return value.toLowerCase() === 'left'
-                                                    || value.toLowerCase() === "top"
-                                                    || value.toLowerCase() === "bottom"
-                                                    || value.toLowerCase() === "right";}}, //
-    connectorGap: {default: 20, type:Number}, //gap between connector and text in percent
-    enableEnterAnimation: {default: true, type: Boolean}, //
-    contentDistance: {default: 15, type: Number}, //
-    connectorFill: {default: 'white', type: String}, //
-    connectorStroke: {default: 'white', type: String}, //
-    connectorStrokeWidth: {default: 10, type: Number}, //
-    lineAppearTime: {default: 0.5, type: Number}, //
-    lineAppearDelay: {default: 0.1, type: Number}, //
+    entryDirection: {
+      default: 'left',
+      type: String,
+      validator (value) {
+        return value.toLowerCase() === 'left' ||
+                                                    value.toLowerCase() === 'top' ||
+                                                    value.toLowerCase() === 'bottom' ||
+                                                    value.toLowerCase() === 'right'
+      }
+    }, //
+    connectorGap: { default: 20, type: Number }, // gap between connector and text in percent
+    enableEnterAnimation: { default: true, type: Boolean }, //
+    contentDistance: { default: 15, type: Number }, //
+    connectorFill: { default: 'white', type: String }, //
+    connectorStroke: { default: 'white', type: String }, //
+    connectorStrokeWidth: { default: 10, type: Number }, //
+    lineAppearTime: { default: 0.5, type: Number }, //
+    lineAppearDelay: { default: 0.1, type: Number } //
   },
   computed: {
-    connectorPath() {
+    connectorPath () {
       switch (this.formattedDirection) {
         case 'left':
-          return [[0,50], [100, 50]];
+          return [[0, 50], [100, 50]]
         case 'right':
-          return [[100, 50], [0,50]];
+          return [[100, 50], [0, 50]]
         case 'top':
-          return [[50, 0], [50,100]];
+          return [[50, 0], [50, 100]]
         case 'bottom':
-          return [[50, 100], [50,0]];
+          return [[50, 100], [50, 0]]
       }
 
-      return [];
+      return []
     },
-    gapObject() {
-      let key = this.formattedDirection === 'left' || this.formattedDirection === 'right' ? 'width' : 'height' ;
-      return {[key]: `${this.connectorGap}px`}
+    gapObject () {
+      const key = this.formattedDirection === 'left' || this.formattedDirection === 'right' ? 'width' : 'height'
+      return { [key]: `${this.connectorGap}px` }
     },
-    alignmentClass() {
-      return 'from-' + this.formattedDirection;
+    alignmentClass () {
+      return 'from-' + this.formattedDirection
     },
-    textEnterClass() {
-      return `connector-${this.formattedDirection}-text`;
+    textEnterClass () {
+      return `connector-${this.formattedDirection}-text`
     },
-    formattedDirection() {
-      return this.entryDirection.toLowerCase();
+    formattedDirection () {
+      return this.entryDirection.toLowerCase()
     }
   },
-  mounted() {
+  mounted () {
     this.$nextTick(() => {
-      this.parentDimensions = [this.$refs.parent.offsetWidth, this.$refs.parent.offsetHeight];
+      this.parentDimensions = [this.$refs.parent.offsetWidth, this.$refs.parent.offsetHeight]
     })
   }
 }

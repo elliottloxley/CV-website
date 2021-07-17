@@ -27,37 +27,35 @@
 
 <script>
 
-
-
 export default {
-  name: "GridViewItem",
+  name: 'GridViewItem',
   props: {
     gridItem: Object,
     descSelectedId: Number,
     maxWidth: String
   },
-  data() {
+  data () {
     return {
     }
   },
   components: {
   },
   computed: {
-    imageStyleUrl() {
+    imageStyleUrl () {
       return {
-        backgroundImage: 'url(' + require('@/assets/' + this.gridItem['img']) + ')'
+        backgroundImage: 'url(' + require('@/assets/' + this.gridItem.img) + ')'
       }
     },
-    descriptionShown() {
-      return this.descSelectedId === this.gridItem.id;
+    descriptionShown () {
+      return this.descSelectedId === this.gridItem.id
     },
-    itemMaxSize() {
-      return {'max-width' : this.maxWidth}
+    itemMaxSize () {
+      return { 'max-width': this.maxWidth }
     }
   },
   methods: {
-    descriptionClicked() {
-      this.$emit("descriptionClicked", this.gridItem.id);
+    descriptionClicked () {
+      this.$emit('descriptionClicked', this.gridItem.id)
     }
   }
 }
@@ -202,7 +200,6 @@ button {
 .description-icon > * {
   color miscTextColour;
 }
-
 
 @keyframes icon-wobble {
   25% {

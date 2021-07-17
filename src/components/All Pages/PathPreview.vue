@@ -19,12 +19,12 @@
 </template>
 
 <script>
-import Particle from "@/components/All Pages/Particle";
+import Particle from '@/components/All Pages/Particle'
 
 export default {
-name: "PathPreview",
-  components: {Particle},
-  data() {
+  name: 'PathPreview',
+  components: { Particle },
+  data () {
     return {
       particleList: [],
       intervalHandle: null,
@@ -32,71 +32,67 @@ name: "PathPreview",
     }
   },
   props: {
-    activated: {default: false, type: Boolean}, //
-    path: {required: true, type: Array}, //
-    pathTime: {default: 1, type: Number}, //
-    perSpawn: {default: 1, type: Number}, //
-    timeBetween: {default: 0.1, type: Number}, //time between perSpawn particles, does not effect spawn speed
-    spawnSpeed: {default: 1, type: Number}, //
+    activated: { default: false, type: Boolean }, //
+    path: { required: true, type: Array }, //
+    pathTime: { default: 1, type: Number }, //
+    perSpawn: { default: 1, type: Number }, //
+    timeBetween: { default: 0.1, type: Number }, // time between perSpawn particles, does not effect spawn speed
+    spawnSpeed: { default: 1, type: Number } //
   },
   methods: {
-    startSpawning() {
-      this.spawn(this.perSpawn);
+    startSpawning () {
+      this.spawn(this.perSpawn)
 
       this.intervalHandle = setInterval(() => {
-        this.spawn(this.perSpawn);
-      }, 1000 / this.spawnSpeed);
+        this.spawn(this.perSpawn)
+      }, 1000 / this.spawnSpeed)
     },
-    stopSpawning() {
-      clearInterval(this.intervalHandle);
-      this.intervalHandle = null;
+    stopSpawning () {
+      clearInterval(this.intervalHandle)
+      this.intervalHandle = null
     },
-    getID() {
-      this.lastID++;
-      return this.lastID - 1;
+    getID () {
+      this.lastID++
+      return this.lastID - 1
     },
-    spawn(amount=1) {
-
-      for(let i = 0; i < amount; i++) {
-
+    spawn (amount = 1) {
+      for (let i = 0; i < amount; i++) {
         setTimeout(() => {
-          this.particleList.unshift(this.getID()); //adds particle to front of array
+          this.particleList.unshift(this.getID()) // adds particle to front of array
 
           setTimeout(() => {
-            this.particleList.pop();
-          }, (this.pathTime * 1000)); //deletes particle from array at end of lifetime
-
-        }, this.timeBetween * i * 1000);
+            this.particleList.pop()
+          }, (this.pathTime * 1000)) // deletes particle from array at end of lifetime
+        }, this.timeBetween * i * 1000)
       }
     },
-    parentDimensions() {
+    parentDimensions () {
       return [this.$refs.particleParent.clientWidth,
-        this.$refs.particleParent.clientHeight, 0];
-    },
+        this.$refs.particleParent.clientHeight, 0]
+    }
   },
-  computed :{
-    particlePath() {
-      let tempPath = [];
+  computed: {
+    particlePath () {
+      const tempPath = []
 
-      for(let i = 0; i < this.path.length; i++) {
-        tempPath.push([this.path[i][0], this.path[i][1], 0]);
+      for (let i = 0; i < this.path.length; i++) {
+        tempPath.push([this.path[i][0], this.path[i][1], 0])
       }
 
-      return tempPath;
+      return tempPath
     }
   },
   watch: {
-    activated(val) {
-      if(val) {
-        this.startSpawning();
+    activated (val) {
+      if (val) {
+        this.startSpawning()
       } else {
-        this.stopSpawning();
+        this.stopSpawning()
       }
     }
   },
-  mounted() {
-  if(this.activated)
-    this.startSpawning();
+  mounted () {
+    if (this.activated) { this.startSpawning() }
   }
 }
 </script>

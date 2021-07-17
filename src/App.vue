@@ -1,5 +1,5 @@
 <template>
-  <div v-if="displayPage" id="app" :class="page" :style="cssVars">
+  <div v-if="displayPage" id="app" :class="page" :style="{backgroundColor: $root.currentTheme.background.base}">
     <SvgFilters></SvgFilters>
     <particle-cloud v-if="true" ref="particleBG" style="position: fixed; width:100vw; height:100vh;"
                     class="particle-cloud"
@@ -35,111 +35,93 @@
   </div>
 </template>
 <script>
-
-import IconPathData from "@/AnimatedIcon/IconPathData";
-import SvgFilters from "@/components/All Pages/SvgFilters";
+import IconPathData from '@/AnimatedIcon/IconPathData'
+import SvgFilters from '@/components/All Pages/SvgFilters'
 import 'vue-md-icons/src/icons/settings'
-import ParticleCloud from "@/components/All Pages/ParticleCloud";
+import ParticleCloud from '@/components/All Pages/ParticleCloud'
+import Vue from 'vue'
 
-export default {
+export default Vue.extend({
   name: 'App',
   components: {
     ParticleCloud,
-    SvgFilters,
+    SvgFilters
   },
   data () {
     return {
-      page: "home",
+      page: 'home',
       settingsIcon: IconPathData.settingsToClose,
       settingsOpen: false,
-      basePerspective: [50,50],
-      currentPerspective: [50,50],
+      basePerspective: [50, 50],
+      currentPerspective: [50, 50],
       currentTransition: '',
       perspectiveShiftX: 40,
       perspectiveShiftY: 40,
-      displayPage: true,
+      displayPage: true
     }
   },
   watch: {
-    $route(to, from) {
-      let differenceX = from.meta.pagePosition[0] - to.meta.pagePosition[0];
-      let differenceY = from.meta.pagePosition[1] - to.meta.pagePosition[1];
-
-      let shiftX = differenceX * this.perspectiveShiftX;
-      let shiftY = differenceY * this.perspectiveShiftY;
-
-      if(differenceX < 0) {
-        this.currentTransition = 'slide-left';
+    $route (to, from) {
+      const differenceX = from.meta.pagePosition[0] - to.meta.pagePosition[0]
+      const differenceY = from.meta.pagePosition[1] - to.meta.pagePosition[1]
+      const shiftX = differenceX * this.perspectiveShiftX
+      const shiftY = differenceY * this.perspectiveShiftY
+      if (differenceX < 0) {
+        this.currentTransition = 'slide-left'
+      } else if (differenceX > 0) {
+        this.currentTransition = 'slide-right'
       }
-      else if(differenceX > 0) {
-        this.currentTransition = 'slide-right';
-      }
-
-      this.page = to.name;
-      this.currentPerspective = [this.currentPerspective[0] + shiftX, this.currentPerspective[1] + shiftY];
+      this.page = to.name
+      this.currentPerspective = [this.currentPerspective[0] + shiftX, this.currentPerspective[1] + shiftY]
     }
   },
   methods: {
-    menuClicked(val) {
-      this.navbarOpen = !val;
-    },
-  },
-  computed: {
-    cloudPerspective() {
-      return `${this.currentPerspective[0]}% ${this.currentPerspective[1]}%`
-    },
-    cssVars() {
-      return {
-        '--bg-color' : this.$root.currentTheme.background.base,
-      }
+    menuClicked (val) {
+      this.navbarOpen = !val
     }
   },
-  mounted() {
-    this.page = this.$route.name;
+  computed: {
+    cloudPerspective () {
+      return `${this.currentPerspective[0]}% ${this.currentPerspective[1]}%`
+    }
+  },
+  mounted () {
+    this.page = this.$route.name
   }
-}
+})
 </script>
 
 <style lang="scss">
-
 html, body {
   width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
   font-family: "Open Sans", "sans-serif";
   font-weight: 300;
   overflow-x: hidden;
-  background-color: var(--bg-color);
 }
-
 #app {
-  height: auto;
+  height: 100%;
   transition: background-color 0.8s;
   position: relative;
   z-index: 0;
   display: flex;
 }
-
 .particle-cloud {
   transition: perspective-origin 0.8s;
-  background-color: var(--bg-color);
 }
-
 .page-view {
 }
-
 .nav-open {
   transform: translateX(0);
 }
-
 .slide-left-enter-active {
   animation: slide-in-left 1s;
 }
-
 .slide-left-leave-active {
   animation: slide-out-left 1s;
 }
-
 @keyframes slide-in-left {
   from {
     transform: translateX(100%);
@@ -148,7 +130,6 @@ html, body {
     transform: translateX(0);
   }
 }
-
 @keyframes slide-out-left {
   from {
   }
@@ -156,15 +137,12 @@ html, body {
     transform: translateX(-100%);
   }
 }
-
 .slide-right-enter-active {
   animation: slide-in-right 1s;
 }
-
 .slide-right-leave-active {
   animation: slide-out-right 1s;
 }
-
 @keyframes slide-in-right {
   from {
     transform: translateX(-100%);
@@ -173,7 +151,6 @@ html, body {
     transform: translateX(0);
   }
 }
-
 @keyframes slide-out-right {
   from {
   }
@@ -181,5 +158,4 @@ html, body {
     transform: translateX(100%);
   }
 }
-
 </style>

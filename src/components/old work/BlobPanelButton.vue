@@ -30,115 +30,127 @@
 
 <script>
 
-import BlobLine from "@/components/old work/BlobLine";
-import MorphingIcon from "@/components/All Pages/MorphingIcon";
+import BlobLine from '@/components/old work/BlobLine'
+import MorphingIcon from '@/components/All Pages/MorphingIcon'
 
 export default {
-  name: "BlobPanelButton",
+  name: 'BlobPanelButton',
   components: {
     MorphingIcon,
     BlobLine
   },
-  data() {
+  data () {
     return {
       isPanelHovered: false,
       isIconHovered: false
     }
   },
   props: {
-    expandSize: {default: 3, type:Number},
-    morphingIconData: {required: true, type: Object},
-    position: {default: 'top right', type:String, validator(value) {
-        let splitVal = value.split(" ");
+    expandSize: { default: 3, type: Number },
+    morphingIconData: { required: true, type: Object },
+    position: {
+      default: 'top right',
+      type: String,
+      validator (value) {
+        const splitVal = value.split(' ')
 
         return splitVal.length === 2 && (
-            splitVal.includes('top') && splitVal.includes('right') ||
+          splitVal.includes('top') && splitVal.includes('right') ||
             splitVal.includes('top') && splitVal.includes('left') ||
             splitVal.includes('bottom') && splitVal.includes('right') ||
             splitVal.includes('bottom') && splitVal.includes('left'))
-      }},
-    isPanelActive: {default: false, type:Boolean},
-    blobFill: {default: '#000', type:String},
-    textSize: {default: 2, type:Number},
-    textColour: {default: '#fff', type:String},
-    iconOffset: {default() {return [13, 13]}, type:Array},
-    iconHoverTransition: {default: "rotate(90deg)", type:String},
-    iconActiveTransition: {default:"rotate(-180deg)", type:String},
-    iconActiveHoverTransition: {default:"scale(1.1) rotate(-180deg)", type:String}
+      }
+    },
+    isPanelActive: { default: false, type: Boolean },
+    blobFill: { default: '#000', type: String },
+    textSize: { default: 2, type: Number },
+    textColour: { default: '#fff', type: String },
+    iconOffset: { default () { return [13, 13] }, type: Array },
+    iconHoverTransition: { default: 'rotate(90deg)', type: String },
+    iconActiveTransition: { default: 'rotate(-180deg)', type: String },
+    iconActiveHoverTransition: { default: 'scale(1.1) rotate(-180deg)', type: String }
   },
   computed: {
-    iconStyle() {
-      return {[this.position.split(" ")[0]]: this.iconOffset[0] + '%',
-        [this.position.split(" ")[1]]: this.iconOffset[1] + '%',
+    iconStyle () {
+      return {
+        [this.position.split(' ')[0]]: this.iconOffset[0] + '%',
+        [this.position.split(' ')[1]]: this.iconOffset[1] + '%',
         width: `${this.textSize}rem`,
         height: `${this.textSize}rem`,
         color: this.textColour,
-        cursor: this.isPanelActive ? "pointer" : "none",
-        pointerEvents: this.isPanelActive ? "all" : "none",
-        transform: this.isIconHovered && this.isPanelActive ? this.iconActiveHoverTransition :
-                    this.isPanelHovered && !this.isPanelActive ? this.iconHoverTransition:
-                    !this.isPanelHovered && this.isPanelActive ? this.iconActiveTransition: ""}
+        cursor: this.isPanelActive ? 'pointer' : 'none',
+        pointerEvents: this.isPanelActive ? 'all' : 'none',
+        transform: this.isIconHovered && this.isPanelActive ? this.iconActiveHoverTransition
+          : this.isPanelHovered && !this.isPanelActive ? this.iconHoverTransition
+            : !this.isPanelHovered && this.isPanelActive ? this.iconActiveTransition : ''
+      }
     },
-    iconShadowStyle() {
-      return {...this.iconStyle,
-        ...{[this.position.split(" ")[0]]: this.iconOffset[0] + 2 + '%',
-          [this.position.split(" ")[1]]: this.iconOffset[1] + 2 + '%'},
-        ...{opacity: this.isIconHovered ? 0.4 : 0}};
+    iconShadowStyle () {
+      return {
+        ...this.iconStyle,
+        ...{
+          [this.position.split(' ')[0]]: this.iconOffset[0] + 2 + '%',
+          [this.position.split(' ')[1]]: this.iconOffset[1] + 2 + '%'
+        },
+        ...{ opacity: this.isIconHovered ? 0.4 : 0 }
+      }
     },
-    blobPanelStyle() {
-      return {transform: `scale(${this.isPanelActive ? this.expandSize : 1})`,
-          transition: 'all 0.3s',
-          transformOrigin: this.position}
+    blobPanelStyle () {
+      return {
+        transform: `scale(${this.isPanelActive ? this.expandSize : 1})`,
+        transition: 'all 0.3s',
+        transformOrigin: this.position
+      }
     },
-    panelStart() {
-      switch(this.position) {
+    panelStart () {
+      switch (this.position) {
         case 'top right': {
-          return [0.2, 0];
+          return [0.2, 0]
         }
         case 'top left': {
-          return [0, 0.8];
+          return [0, 0.8]
         }
         case 'bottom right': {
-          return [1, 0.2];
+          return [1, 0.2]
         }
         case 'bottom left': {
-          return [0.8, 1];
+          return [0.8, 1]
         }
       }
-      return [];
+      return []
     },
-    panelEnd() {
-      switch(this.position) {
+    panelEnd () {
+      switch (this.position) {
         case 'top right': {
-          return [1, 0.8];
+          return [1, 0.8]
         }
         case 'top left': {
-          return [0.8, 0];
+          return [0.8, 0]
         }
         case 'bottom right': {
-          return [0.2, 1];
+          return [0.2, 1]
         }
         case 'bottom left': {
-          return [0, 0.2];
+          return [0, 0.2]
         }
       }
-      return [];
+      return []
     }
   },
   methods: {
-    mouseEnter() {
-      if(!this.isPanelActive) {
-        this.isPanelHovered = true;
+    mouseEnter () {
+      if (!this.isPanelActive) {
+        this.isPanelHovered = true
       }
     },
-    mouseLeave() {
-      this.isPanelHovered = false;
+    mouseLeave () {
+      this.isPanelHovered = false
     },
-    clicked() {
-      this.$emit("panelClicked");
+    clicked () {
+      this.$emit('panelClicked')
     },
-    outsideClick(event) {
-      this.$emit("clickedOutside", event);
+    outsideClick (event) {
+      this.$emit('clickedOutside', event)
     }
   }
 }

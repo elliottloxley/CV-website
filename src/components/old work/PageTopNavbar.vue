@@ -21,32 +21,32 @@
 
 <script>
 export default {
-  name: "PageTopNavbar",
+  name: 'PageTopNavbar',
   computed: {
-    currentRoute() {
-      return this.$route.name;
+    currentRoute () {
+      return this.$route.name
     }
   },
-  mounted() {
-    setTimeout(() => this.notLoaded = false, 500);
+  mounted () {
+    setTimeout(() => this.notLoaded = false, 500)
   },
   watch: {
-    $route(to, from) {
-      if (from.name === "home") {
-        this.notLoaded = true;
-        setTimeout(() => this.notLoaded = false, 500);
+    $route (to, from) {
+      if (from.name === 'home') {
+        this.notLoaded = true
+        setTimeout(() => this.notLoaded = false, 500)
       }
     }
   },
-  data() {
+  data () {
     return {
       activeClass: 'active-link',
-      notLoaded: true,
-    };
+      notLoaded: true
+    }
   },
   methods: {
-    onRoute(routeCheck) {
-      return this.$route.name.includes(routeCheck);
+    onRoute (routeCheck) {
+      return this.$route.name.includes(routeCheck)
     }
   }
 }

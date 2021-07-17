@@ -44,307 +44,304 @@
   </div>
 </template>
 
-<script>
-import pathingHelperFunctions from "@/mixins/pathingHelperFunctions";
-import timingHelperFunctions from "@/mixins/timingHelperFunctions";
-import uniqueId from "@/mixins/uniqueId";
-import {debounce} from "debounce";
+<script lang="ts">
+
+import pathingHelperFunctions from '@/mixins/pathingHelperFunctions'
+import timingHelperFunctions from '@/mixins/timingHelperFunctions'
+import uniqueId from '@/mixins/uniqueId'
+import debounce from 'debounce.vue'
+
+export type FeatherOffset = {[index :string] : [number, number]};
 
 export default {
-  name: "LinePath",
+  name: 'LinePath',
   mixins: [uniqueId, pathingHelperFunctions, timingHelperFunctions],
-  data() {
+  data () {
     return {
       transitionString: '',
       viewBoxWidth: 100,
       viewBoxHeight: 100,
       featherID: 'featherNode' + this.getUniqueId(),
       nodes: [],
+
       parentWidth: -1,
       parentHeight: -1,
       animateStart: false,
       initialised: false,
-      resizeListener: null,
+      resizeListener: null
     }
   },
   props: {
     pathCoords: {required: true, type: Array}, //
-    relativeCoord: {default() {return [0,0]}, type:Array}, //
-    start: {default: true, type:Boolean}, //
-    disableAnimation: {default: false, type: Boolean}, //disables all animation: shows nodes and full line on component load
+    relativeCoord: {default () { return [0, 0] }, type: Array}, //
+    start: {default: true, type: Boolean}, //
+    disableAnimation: {default: false, type: Boolean}, // disables all animation: shows nodes and full line on component load
     animateTime: {default: 1, type: Number}, //
-    lineWidth: {default: 10, type:Number}, //
-    roundedCorners: {default: false, type:Boolean}, //
-    lineColour: {default: 'white', type:String},
-    lineJoin: {default: 'round', type:String},
-    linePercent: {default: 1, type:Number},
-    showNodes: {default: false, type:Boolean},
-    excludedNodes: {default() {return []}, type:Array}, //node indexes on path
-    nodeShape: {default() {return [[50,0],[100,50],[50,100],[0,50]]}, type: Array}, //
+    lineWidth: {default: 10, type: Number}, //
+    roundedCorners: {default: false, type: Boolean}, //
+    lineColour: {default: 'white', type: String},
+    lineJoin: {default: 'round', type: String},
+    linePercent: {default: 1, type: Number},
+    showNodes: {default: false, type: Boolean},
+    excludedNodes: {default () { return [] }, type: Array}, // node indexes on path
+    nodeShape: {default () { return [[50, 0], [100, 50], [50, 100], [0, 50]] }, type: Array}, //
     nodeFillColour: {default: 'white', type: String}, //
-    nodeSize: {default() {return ['20px','20px']}, type: Array}, //array of css sizes eg. ['10px','10%']
+    nodeSize: {default () { return ['20px', '20px'] }, type: Array}, // array of css sizes eg. ['10px','10%']
     nodeStrokeWidth: {default: 0, type: Number}, //
     nodeStrokeColour: {default: 'white', type: String}, //
     animateDelay: {default: 0, type: Number}, //
     nodeAppearDelay: {default: 0, type: Number}, //
-    nodeAdvanceAppear: {default() {return {}}, type:Object}, //{'0': 0.5} {index : advance} index of node and advance in seconds
-    transitionTimingFunction: {default: 'ease-in', type: String}, //set to linear automatically if nodes are shown
-    nodesToFeather: {default() {return []}, type: Array}, //line will fade going into and out of nodes
+    nodeAdvanceAppear: {default () { return {} }, type: Object}, // {'0': 0.5} {index : advance} index of node and advance in seconds
+    transitionTimingFunction: {default: 'ease-in', type: String}, // set to linear automatically if nodes are shown
+    nodesToFeather: {default () { return [] }, type: Array}, // line will fade going into and out of nodes
     featherNodeRadius: {default: 3, type: Number}, //
-    customFeatherNodeScale: {default() {return {}}, type: Object}, //{'0': 1.5} {index : scale}
-    customFeatherNodeOffset: {default() {return {}}, type:Object}, //{'0': [25,50]}
-    featherNodeScale: {default: 1, type:Number}, //
+    customFeatherNodeScale: {default () { return {} }, type: Object}, // {'0': 1.5} {index : scale}
+    customFeatherNodeOffset: {default () { return {} }, type: Object}, // {'0': [25,50]}
+    featherNodeScale: {default: 1, type: Number} //
   },
   methods: {
-    initialise() {
-      let delay = this.disableAnimation ? 0 : this.animateDelay * 1000
+    initialise () {
+      const delay = this.disableAnimation ? 0 : this.animateDelay * 1000
       setTimeout(() => {
-        this.animateStart = true;
-        if(this.showNodes) {
-          this.initialiseNodes();
+        this.animateStart = true
+        if (this.showNodes) {
+          this.initialiseNodes()
         }
-      }, delay + 10);
+      }, delay + 10)
 
-      setTimeout(() => {this.initialised = true;}, 10);
+      setTimeout(() => { this.initialised = true }, 10)
     },
-    getNodeAdvance(index) {
-      if(this.nodeAdvanceAppear[index]) {
-        return this.nodeAdvanceAppear[index];
+    getNodeAdvance (index) {
+      if (this.nodeAdvanceAppear[index]) {
+        return this.nodeAdvanceAppear[index]
       }
-      return 0;
+      return 0
     },
-    nodeShouldAppear(index) {
-      return this.linePercent >= this.nodePercentages[index] && this.showNodes && !this.excludedNodes.includes(index);
+    nodeShouldAppear (index) {
+      return this.linePercent >= this.nodePercentages[index] && this.showNodes && !this.excludedNodes.includes(index)
     },
-    nodeFeatherPath(index) {
-      let halfWidth = this.featherNodeWidthHeight[0] / 2;
-      let halfHeight = this.featherNodeWidthHeight[1] / 2;
+    nodeFeatherPath (index) {
+      const halfWidth = this.featherNodeWidthHeight[0] / 2
+      const halfHeight = this.featherNodeWidthHeight[1] / 2
 
-      let x = this.relativePathCoords[index][0];
-      let y = this.relativePathCoords[index][1];
+      const x = this.relativePathCoords[index][0]
+      const y = this.relativePathCoords[index][1]
 
-      let path = `M${x-halfWidth},${y-halfHeight} M${x+halfWidth},${y-halfHeight} M${x+halfWidth},${y+halfHeight} M${x-halfWidth},${y+halfHeight} `;
+      let path = `M${x - halfWidth},${y - halfHeight} M${x + halfWidth},${y - halfHeight} M${x + halfWidth},${y + halfHeight} M${x - halfWidth},${y + halfHeight} `
 
-      //gets node direction vectors
-      let beforeDirection = this.getNodeDirectionToOther(index, index-1);
-      let afterDirection = this.getNodeDirectionToOther(index, index+1);
+      // gets node direction vectors
+      const beforeDirection = this.getNodeDirectionToOther(index, index - 1)
+      const afterDirection = this.getNodeDirectionToOther(index, index + 1)
 
-      if(beforeDirection.length !== 0) {
+      if (beforeDirection.length !== 0) {
         path += `M${x},${y} l${beforeDirection[0] * halfWidth},${beforeDirection[1] * halfHeight} `
       }
 
-      if(afterDirection.length !== 0) {
+      if (afterDirection.length !== 0) {
         path += `M${x},${y} l${afterDirection[0] * halfWidth},${afterDirection[1] * halfHeight} `
       }
 
-      return path;
+      return path
     },
-    nodeFeatherStyle(index) {
+    nodeFeatherStyle (index) {
+      let translate = ''
 
-      let translate = '';
-
-      if(index in this.customFeatherNodeOffset) {
-        translate = `translate(${this.customFeatherNodeOffset[index][0]}%, ${this.customFeatherNodeOffset[index][1]}%)`;
+      if (index in this.customFeatherNodeOffset) {
+        translate = `translate(${this.customFeatherNodeOffset[index][0]}%, ${this.customFeatherNodeOffset[index][1]}%)`
       }
 
-      return {transform: `scale(${index in this.customFeatherNodeScale ? this.customFeatherNodeScale[index] : this.featherNodeScale}) ${translate}`,
-        transition : this.disableAnimation ? '' : 'transform 0.5s'};
-    },
-    getNodeDirectionToOther(index, index2) {
-      if(this.pathCoords[index2]) {
-
-        let direction = [this.pathCoords[index2][0] - this.pathCoords[index][0], this.pathCoords[index2][1] - this.pathCoords[index][1]]
-
-        return this.getNormalisedVector(direction);
-      }
-      else {
-        return [];
+      return {
+        transform: `scale(${index in this.customFeatherNodeScale ? this.customFeatherNodeScale[index] : this.featherNodeScale}) ${translate}`,
+        transition: this.disableAnimation ? '' : 'transform 0.5s'
       }
     },
-    createNode(coord, index, delay) {
+    getNodeDirectionToOther (index, index2) {
+      if (this.pathCoords[index2]) {
+        const direction = [this.pathCoords[index2][0] - this.pathCoords[index][0], this.pathCoords[index2][1] - this.pathCoords[index][1]]
 
+        return this.getNormalisedVector(direction)
+      } else {
+        return []
+      }
+    },
+    createNode (coord, index, delay) {
       const addNode = () => {
         if (this.nodeShouldAppear(index)) {
-          this.nodes.push({index: index, coord: coord, disableDefault: false});
-        }
-        else if(`nodeSlot${index}` in this.$slots) {
-          this.nodes.push({index: index, coord: coord, disableDefault: true});
+          this.nodes.push({index: index, coord: coord, disableDefault: false})
+        } else if (`nodeSlot${index}` in this.$slots) {
+          this.nodes.push({index: index, coord: coord, disableDefault: true})
         }
       }
 
       const emitNode = () => {
-        this.$emit("reachednode", index);
+        this.$emit('reachednode', index)
 
         if (this.lastNodeIndex === index) {
-          this.$emit("reachedlastnode");
+          this.$emit('reachedlastnode')
         }
       }
 
-      setTimeout(emitNode, delay * 1000);
+      setTimeout(emitNode, delay * 1000)
 
-      if(this.disableAnimation) {
-        addNode();
-      }
-      else {
-        setTimeout(addNode, (delay * 1000));
+      if (this.disableAnimation) {
+        addNode()
+      } else {
+        setTimeout(addNode, (delay * 1000))
       }
     },
-    initialiseNodes() {
+    initialiseNodes () {
+      for (const index in this.nodeCoords) {
+        const indexNum = parseInt(index)
+        const delayAdvance = this.getNodeAdvance(indexNum)
+
+        const delay = this.nodeDelays[indexNum] - delayAdvance
+        this.createNode(this.nodeCoords[index].slice(), indexNum, delay)
+      }
+    },
+    updateNodes () {
+      this.nodes.splice(0)
 
       for (const index in this.nodeCoords) {
-        let indexNum = parseInt(index);
-        let delayAdvance = this.getNodeAdvance(indexNum);
-
-        let delay = this.nodeDelays[indexNum] - delayAdvance;
-        this.createNode(this.nodeCoords[index].slice(), indexNum, delay);
+        const indexNum = parseInt(index)
+        this.createNode(this.nodeCoords[index], indexNum, 0)
       }
     },
-    updateNodes() {
-      this.nodes.splice(0);
-
-      for (const index in this.nodeCoords) {
-        let indexNum = parseInt(index);
-        this.createNode(this.nodeCoords[index], indexNum, 0);
-      }
+    featherNodeSvgViewbox () {
+      return `0 0 ${this.parentWidth} ${this.parentHeight}`
     },
-    featherNodeSvgViewbox() {
-      return `0 0 ${this.parentWidth} ${this.parentHeight}`;
-    },
-    onResize() {
-      this.parentWidth = this.$refs.parent.clientWidth;
-      this.parentHeight = this.$refs.parent.clientHeight;
-    },
+    onResize () {
+      this.parentWidth = this.$refs.parent.clientWidth
+      this.parentHeight = this.$refs.parent.clientHeight
+    }
   },
   computed: {
-    svgPath() {
-      let path = `M${this.relativePathCoords[0][0]},${this.relativePathCoords[0][1]}`;
+    svgPath () {
+      let path = `M${this.relativePathCoords[0][0]},${this.relativePathCoords[0][1]}`
 
-      for(let i = 1; i < this.relativePathCoords.length; i++) {
-        path += `L${this.relativePathCoords[i][0]},${this.relativePathCoords[i][1]}`;
+      for (let i = 1; i < this.relativePathCoords.length; i++) {
+        path += `L${this.relativePathCoords[i][0]},${this.relativePathCoords[i][1]}`
       }
 
-      return path;
+      return path
     },
-    nodePath() {
-      let path = `M${this.nodeShape[0][0]},${this.nodeShape[0][1]}`;
+    nodePath () {
+      let path = `M${this.nodeShape[0][0]},${this.nodeShape[0][1]}`
 
-      for(let i = 1; i < this.nodeShape.length; i++) {
-        path += `L${this.nodeShape[i][0]},${this.nodeShape[i][1]}`;
+      for (let i = 1; i < this.nodeShape.length; i++) {
+        path += `L${this.nodeShape[i][0]},${this.nodeShape[i][1]}`
       }
 
       path += 'z'
 
-      return path;
+      return path
     },
-    relativePathCoords() {
-      let relativeCoords = [];
+    relativePathCoords () {
+      const relativeCoords = []
 
-      for(let i = 0; i < this.pathCoords.length; i++) {
-        let coord = [this.pathCoords[i][0] + this.relativeCoord[0], this.pathCoords[i][1] + this.relativeCoord[1]];
-        relativeCoords.push(coord);
+      for (let i = 0; i < this.pathCoords.length; i++) {
+        const coord = [this.pathCoords[i][0] + this.relativeCoord[0], this.pathCoords[i][1] + this.relativeCoord[1]]
+        relativeCoords.push(coord)
       }
 
-      return relativeCoords;
+      return relativeCoords
     },
-    timePerPathSegment() {
-      return this.getTimePerPathSegmentScaled(this.absolutePathCoords, this.lineLength, this.animateTime);
+    timePerPathSegment () {
+      return this.getTimePerPathSegmentScaled(this.absolutePathCoords, this.lineLength, this.animateTime)
     },
-    nodeDelays() {
-      let total = 0;
-      let nodeTimes = [0];
+    nodeDelays () {
+      let total = 0
+      const nodeTimes = [0]
 
-      for(let i = 0; i < this.timePerPathSegment.length; i++) {
-
-        total += this.timePerPathSegment[i];
-        nodeTimes.push(total);
+      for (let i = 0; i < this.timePerPathSegment.length; i++) {
+        total += this.timePerPathSegment[i]
+        nodeTimes.push(total)
       }
 
-      return nodeTimes;
+      return nodeTimes
     },
-    absolutePathCoords() {
-      let coords = [];
-
-      for(let i = 0; i < this.relativePathCoords.length; i++) {
-        coords.push([(this.relativePathCoords[i][0] / 100) * this.parentWidth,
-                      (this.relativePathCoords[i][1] / 100) * this.parentHeight])
-      }
-
-      return coords;
-    },
-    lineLengthBeforeScale() {
-      let pathProperties = this.getPropertiesFromPathString(this.svgPath);
-      return pathProperties.getTotalLength();
-    },
-    lineLength() {
-      return this.lineLengthBeforeScale * this.scaleMultiplier;
-    },
-    currentOffset() {
-      return (this.animateStart ? (this.lineLength * (1-this.linePercent)) : this.lineLength);
-    },
-    scaleMultiplier() {
-      return Math.max(this.parentWidth, this.parentHeight) / this.viewBoxWidth;
-    },
-    lastNodeIndex() {
-      return this.pathCoords.length - 1;
-    },
-    nodeCoords() {
-      let coords = {};
+    absolutePathCoords () {
+      const coords = []
 
       for (let i = 0; i < this.relativePathCoords.length; i++) {
-        coords[i] =  this.relativePathCoords[i].slice();
+        coords.push([(this.relativePathCoords[i][0] / 100) * this.parentWidth,
+          (this.relativePathCoords[i][1] / 100) * this.parentHeight])
       }
 
-      return coords;
+      return coords
     },
-    nodePercentages() {
-      return this.getPercentDistanceOfEachNode(this.relativePathCoords);
+    lineLengthBeforeScale () {
+      const pathProperties = this.getPropertiesFromPathString(this.svgPath)
+      return pathProperties.getTotalLength()
     },
-    scaledPathCoords() {
+    lineLength () {
+      return this.lineLengthBeforeScale * this.scaleMultiplier
+    },
+    currentOffset () {
+      return (this.animateStart ? (this.lineLength * (1 - this.linePercent)) : this.lineLength)
+    },
+    scaleMultiplier () {
+      return Math.max(this.parentWidth, this.parentHeight) / this.viewBoxWidth
+    },
+    lastNodeIndex () {
+      return this.pathCoords.length - 1
+    },
+    nodeCoords () {
+      const coords = {}
 
-      let scaledCoords = [];
-
-      for(let i = 0; i < this.relativePathCoords.length; i++) {
-        scaledCoords.push([(this.relativePathCoords[i][0] * this.viewBoxWidth) / 100,(this.relativePathCoords[i][1] * this.viewBoxHeight) / 100]);
+      for (let i = 0; i < this.relativePathCoords.length; i++) {
+        coords[i] = this.relativePathCoords[i].slice()
       }
-      return scaledCoords;
-    },
-    featherNodeWidthHeight() {
-      let radiusPercent = (this.featherNodeRadius / 1000);
 
-      return [radiusPercent * this.parentHeight, radiusPercent * this.parentWidth];
+      return coords
+    },
+    nodePercentages () {
+      return this.getPercentDistanceOfEachNode(this.relativePathCoords)
+    },
+    scaledPathCoords () {
+      const scaledCoords = []
+
+      for (let i = 0; i < this.relativePathCoords.length; i++) {
+        scaledCoords.push([(this.relativePathCoords[i][0] * this.viewBoxWidth) / 100, (this.relativePathCoords[i][1] * this.viewBoxHeight) / 100])
+      }
+      return scaledCoords
+    },
+    featherNodeWidthHeight () {
+      const radiusPercent = (this.featherNodeRadius / 1000)
+
+      return [radiusPercent * this.parentHeight, radiusPercent * this.parentWidth]
     }
   },
-  mounted() {
+  mounted () {
     this.$nextTick(() => {
-      this.parentWidth = this.$refs.parent.clientWidth;
-      this.parentHeight = this.$refs.parent.clientHeight;
-      if(this.start) {
-        this.initialise();
+      this.parentWidth = this.$refs.parent.clientWidth
+      this.parentHeight = this.$refs.parent.clientHeight
+      if (this.start) {
+        this.initialise()
       }
-    });
+    })
   },
-  created() {
-    this.resizeListener = window.addEventListener('resize', debounce(() => {this.onResize()}, 200));
+  created () {
+    this.resizeListener = window.addEventListener('resize', debounce(() => { this.onResize() }, 200))
   },
-  destroyed() {
-    this.resizeListener.removeEventListener();
+  destroyed () {
+    this.resizeListener.removeEventListener()
   },
   watch: {
-    linePercent() {
-      if(this.start) {
-        this.updateNodes();
+    linePercent () {
+      if (this.start) {
+        this.updateNodes()
       }
     },
-    showNodes() {
-      if(this.start) {
-        this.updateNodes();
+    showNodes () {
+      if (this.start) {
+        this.updateNodes()
       }
     },
-    start(val) {
-      if(val) {
-        this.initialise();
+    start (val) {
+      if (val) {
+        this.initialise()
       }
-    },
+    }
   }
 }
 </script>
